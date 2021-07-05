@@ -40,6 +40,9 @@
     - Add new link to models
     - Change included models in world file from model database to modified model
     - Add execution dependencies and export to Gazebo model path
+7. Try implement and integrate plugin 
+    - Add plugin file used in gazebo tutorial [Model plugins](http://gazebosim.org/tutorials?tut=plugins_model&cat=write_plugin) in the plugins directory
+    - Modify `package.xml`, `CMakeLists.txt`, and world file to integrate the plugin
 
 ## How to run
 1. Clone this repository
@@ -49,7 +52,15 @@
     catkin_make
     source devel/setup.bash
     ```
-4. Run using `roslaunch`
+4. Create build folder (if it isn't already created) and compile our program
+    ```sh
+    cd src/ssl_robocup_gazebo
+    mkdir -p build
+    cd build
+    cmake ../
+    make
+    ```
+5. Run using `roslaunch`
     ```
     roslaunch ssl_robocup_gazebo ssl_robocup.launch 
     ```
