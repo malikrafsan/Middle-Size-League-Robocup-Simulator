@@ -11,24 +11,24 @@
     </include>
     <!-- RoboCup SPL 2014 field -->
     <include>
-      <uri>model://robocup14_spl_field</uri>
+      <uri>model://robocup_ssl_field</uri>
     </include>
     <!-- RoboCup SPL 2014 left goal -->
     <include>
       <pose>-4.5 0 0 0 0 3.1416</pose>
-      <uri>model://robocup14_spl_goal</uri>
-      <name>robocup14_spl_left_goal</name>
+      <uri>model://robocup_ssl_goal</uri>
+      <name>robocup_ssl_left_goal</name>
     </include>
     <!-- RoboCup SPL 2014 right goal -->
     <include>
       <pose>4.5 0 0 0 0 0</pose>
-      <uri>model://robocup14_spl_goal</uri>
-      <name>robocup14_spl_right_goal</name>
+      <uri>model://robocup_ssl_goal</uri>
+      <name>robocup_ssl_right_goal</name>
     </include>
     <!-- RoboCup SPL ball -->
     <include>
       <pose>0 0 0 0 0 0</pose>
-      <uri>model://robocup_spl_ball</uri>
+      <uri>model://robocup_ssl_ball</uri>
     </include>
     <!-- Turtlebot 1 -->
     <include>
