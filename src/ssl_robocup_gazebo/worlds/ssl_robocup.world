@@ -51,5 +51,6 @@
       <uri>model://turtlebot</uri>
       <name>turtlebot3</name>
     </include>
+    <plugin name="goal_out_detection" filename="libgoal_out_detection.so"/>
   </world>
 </sdf>
