@@ -43,6 +43,9 @@
 7. Try implement and integrate plugin 
     - Add plugin file used in gazebo tutorial [Model plugins](http://gazebosim.org/tutorials?tut=plugins_model&cat=write_plugin) in the plugins directory
     - Modify `package.xml`, `CMakeLists.txt`, and world file to integrate the plugin
+8. Implemented follow_ball which implement:
+    - Client of the position service at /gazebo/get_model_state
+    - Follow the ball with naive approach (by adding a linear velocity by the distance)
 
 ## How to run
 1. Clone this repository
