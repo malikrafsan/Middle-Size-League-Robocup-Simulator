@@ -29,6 +29,7 @@
     <include>
       <pose>0 0 0 0 0 0</pose>
       <uri>model://robocup_ssl_ball</uri>
+      <name>ball</name>
     </include>
     <!-- Turtlebot 1 -->
     <include>
@@ -42,6 +43,7 @@
       <pose>0 1 0 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot2</name>
+      <plugin name="follow_ball" filename="libfollow_ball.so"/>
     </include>
     <!-- Turtlebot 3 -->
     <include>
