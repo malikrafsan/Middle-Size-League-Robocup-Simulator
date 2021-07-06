@@ -53,7 +53,6 @@ namespace gazebo
 
         float x_difference = ball_position.response.pose.position.x-self_position.response.pose.position.x; 
         float y_difference = ball_position.response.pose.position.y-self_position.response.pose.position.y; 
-        float z_difference = ball_position.response.pose.position.z-self_position.response.pose.position.z; 
         this->model->SetLinearVel(ignition::math::Vector3d(x_difference, y_difference, 0));
    }
 
