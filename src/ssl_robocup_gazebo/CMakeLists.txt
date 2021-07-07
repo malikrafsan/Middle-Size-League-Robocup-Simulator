@@ -218,6 +218,11 @@ target_link_libraries(model_push ${GAZEBO_LIBRARIES})
 add_library(follow_ball SHARED plugins/follow_ball.cc)
 target_link_libraries(follow_ball ${GAZEBO_LIBRARIES})
 
+<<<<<<< HEAD
 
 add_library(gazebo_ros_link_attacher SHARED plugins/gazebo_ros_link_attacher.cc)
 target_link_libraries(gazebo_ros_link_attacher ${GAZEBO_LIBRARIES})
+=======
+add_library(goal_out_detection SHARED plugins/goal_out_detection.cc)
+target_link_libraries(goal_out_detection ${GAZEBO_LIBRARIES} )
+>>>>>>> 1b61f3d2737b386c1f35c0f24d60c44a6f5b19c3

@@ -46,6 +46,14 @@
 8. Implemented follow_ball which implement:
     - Client of the position service at /gazebo/get_model_state
     - Follow the ball with naive approach (by adding a linear velocity by the distance)
+9. Implemented service for attaching 2 model together:
+    - Done at /link_attacher_node/attach and /link_attacher_node/attach
+    - The args of this service is the following
+    ```bash
+    rosservice call /link_attacher_node/attach "model_name_1:'model_name' link_name_1:'link_name' model_name_2:'model_name' link_name_2:'link_name'"
+    rosservice call /link_attacher_node/detach "model_name_1:'model_name' link_name_1:'link_name' model_name_2:'model_name' link_name_2:'link_name'"
+    ```
+    - Link for the turtlebot is named `rack` and for the ball its `ball`.  
 
 ## How to run
 1. Clone this repository
