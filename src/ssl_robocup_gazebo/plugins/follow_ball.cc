@@ -51,9 +51,11 @@ namespace gazebo
         self_position.request.model_name = this->model->GetName().c_str();
         this->rosPositionSrv.call(self_position);
 
+
         float x_difference = ball_position.response.pose.position.x-self_position.response.pose.position.x; 
         float y_difference = ball_position.response.pose.position.y-self_position.response.pose.position.y; 
-        this->model->SetLinearVel(ignition::math::Vector3d(x_difference, y_difference, 0));
+        // this->model->SetLinearVel(ignition::math::Vector3d(x_difference, y_difference, 0));
+        this->model->SetAngularVel(ignition::math::Vector3d(0, 0, ));
    }
 
     // Pointer to the model
