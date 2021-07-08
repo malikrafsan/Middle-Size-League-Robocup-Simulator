@@ -46,14 +46,24 @@
 8. Implemented follow_ball which implement:
     - Client of the position service at /gazebo/get_model_state
     - Follow the ball with naive approach (by adding a linear velocity by the distance)
-9. Implemented service for attaching 2 model together:
+9. Implement `goal_out_detection` plugin to reset world if the ball is out of field or there is goal
+    - Client of the model's position (including ball) at `/gazebo/get_model_state`
+    - Get model's position that is named "ball"
+    - Check whether the position is outside the side / end line, if yes, reset the world 
+10. Implemented service for attaching 2 model together:
     - Done at /link_attacher_node/attach and /link_attacher_node/attach
     - The args of this service is the following
     ```bash
     rosservice call /link_attacher_node/attach "model_name_1:'model_name' link_name_1:'link_name' model_name_2:'model_name' link_name_2:'link_name'"
     rosservice call /link_attacher_node/detach "model_name_1:'model_name' link_name_1:'link_name' model_name_2:'model_name' link_name_2:'link_name'"
     ```
-    - Link for the turtlebot is named `rack` and for the ball its `ball`.  
+    - Link for the turtlebot is named `rack` and for the ball its `ball`.
+11. Implement `pass_ball` plugin to pass the ball from one robot to another robot
+    - Store ModelPtr of the model
+    - Get the WorldPtr and store it
+    - Get the teammate robot ModelPtr and store it
+    - Find position such that the ball, the model robot, and the teammate robot are in one line, then go to that position
+    - Check whether the distance between the ball and the robot is below the threshold, if below, kick (set linear velocity of) the ball 
 
 ## How to run
 1. Clone this repository
