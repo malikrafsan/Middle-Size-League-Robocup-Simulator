@@ -16,7 +16,7 @@
 
 namespace gazebo
 {
-class KickBall : public ModelPlugin
+class MakeGoal : public ModelPlugin
 {
   // Called by the world update start event
   public: void OnUpdate()
@@ -25,43 +25,18 @@ class KickBall : public ModelPlugin
       ball_position.request.model_name = "ball";
       this->rosPositionSrv.call(ball_position);
 
-      gazebo_msgs::GetModelState ally_position ;  
-      ally_position.request.model_name = "turtlebot3";
-      this->rosPositionSrv.call(ally_position);
-
       gazebo_msgs::GetModelState self_position;  
       self_position.request.model_name = this->model->GetName().c_str();
       this->rosPositionSrv.call(self_position);
 
-      double ally_ball_X = ally_position.response.pose.position.x - ball_position.response.pose.position.x;
-      double ally_ball_Y = ally_position.response.pose.position.y - ball_position.response.pose.position.y;
-      double gradien = ally_ball_Y / ally_ball_X;
-
-      double self_ball_X = 0.3 / std::sqrt(1 + gradien*gradien);
-
-      double posX;
-
-      if (ally_ball_X < 0) {
-          posX = ball_position.response.pose.position.x + self_ball_X;
-      } else {
-          posX = ball_position.response.pose.position.x - self_ball_X;
-      }
-
-      double posY = ball_position.response.pose.position.y - gradien * (ball_position.response.pose.position.x - posX);
-
-      this->model->SetLinearVel(ignition::math::Vector3d((posX - self_position.response.pose.position.x)*2, (posY - self_position.response.pose.position.y)*2, 0));
-
-      double distanceX = posX - self_position.response.pose.position.x;
-      double distanceY = posY - self_position.response.pose.position.y;
+      double distanceX = ball_position.response.pose.position.x - self_position.response.pose.position.x;
+      double distanceY = ball_position.response.pose.position.y - self_position.response.pose.position.y;
 
       double absDistance = std::sqrt(std::pow(distanceX, 2) + std::pow(distanceY, 2) * 1.0);
 
-      double velX = (ally_position.response.pose.position.x - ball_position.response.pose.position.x);
-      double velY = (ally_position.response.pose.position.y - ball_position.response.pose.position.y);
-
       if (absDistance < 0.075) {
         ssl_robocup_gazebo::MoveBall move_ball;
-        move_ball.request.target_model_name = "turtlebot3"; 
+        move_ball.request.target_model_name = "robocup_ssl_left_goal"; 
         move_ball.request.origin_model_name = this->model->GetName().c_str();  
         this->rosBallMoverSrv.call(move_ball);
       }
@@ -73,17 +48,17 @@ class KickBall : public ModelPlugin
     this->model = _parent;
     this->world = _parent->GetWorld();
     this->ball = world->ModelByName("ball");
-    this->ally = world->ModelByName("turtlebot3");
+    this->ally = world->ModelByName("robocup_ssl_left_goal");
 
     if (!ros::isInitialized())
     {
         int argc = 0;
         char **argv = NULL;
-        ros::init(argc, argv, "pass_ball",
+        ros::init(argc, argv, "make_goal",
         ros::init_options::NoSigintHandler);
     }
 
-    this->rosNode.reset(new ros::NodeHandle("pass_ball"));
+    this->rosNode.reset(new ros::NodeHandle("make_goal"));
 
     this->rosPositionSrv = this->rosNode->serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
     this->rosBallMoverSrv= this->rosNode->serviceClient<ssl_robocup_gazebo::MoveBall>("/kinetics/move_ball");
@@ -91,7 +66,7 @@ class KickBall : public ModelPlugin
     // Listen to the update event. This event is broadcast every
     // simulation iteration.
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        std::bind(&KickBall::OnUpdate, this));
+        std::bind(&MakeGoal::OnUpdate, this));
   }
   /// \brief A node use for ROS transport
   private: std::unique_ptr<ros::NodeHandle> rosNode;
@@ -113,5 +88,6 @@ class KickBall : public ModelPlugin
 };
 
 // Register this plugin with the simulator
-GZ_REGISTER_MODEL_PLUGIN(KickBall)
+GZ_REGISTER_MODEL_PLUGIN(MakeGoal)
 }
+
