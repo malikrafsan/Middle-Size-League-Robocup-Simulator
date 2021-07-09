@@ -10,6 +10,9 @@
 #include "gazebo/physics/physics.hh"
 #include <ignition/math/Vector3.hh>
 #include <math.h>
+#include "ssl_robocup_gazebo/MoveBall.h"
+#include "ssl_robocup_gazebo/MoveBallRequest.h"
+#include "ssl_robocup_gazebo/MoveBallResponse.h"
 
 namespace gazebo
 {
@@ -57,7 +60,10 @@ class KickBall : public ModelPlugin
       double velY = (ally_position.response.pose.position.y - ball_position.response.pose.position.y);
 
       if (absDistance < 0.075) {
-          this->ball->SetLinearVel(ignition::math::Vector3d(velX, velY, 1.5));
+        ssl_robocup_gazebo::MoveBall move_ball;
+        move_ball.request.target_model_name = "turtlebot3"; 
+        move_ball.request.origin_model_name = this->model->GetName().c_str();  
+        this->rosBallMoverSrv.call(move_ball);
       }
   }
 
@@ -80,6 +86,7 @@ class KickBall : public ModelPlugin
     this->rosNode.reset(new ros::NodeHandle("pass_ball"));
 
     this->rosPositionSrv = this->rosNode->serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+    this->rosBallMoverSrv= this->rosNode->serviceClient<ssl_robocup_gazebo::MoveBall>("/kinetics/move_ball");
 
     // Listen to the update event. This event is broadcast every
     // simulation iteration.
@@ -89,8 +96,9 @@ class KickBall : public ModelPlugin
   /// \brief A node use for ROS transport
   private: std::unique_ptr<ros::NodeHandle> rosNode;
 
-  /// \brief A ROS service client
+  /// \brief ROS service client
   private: ros::ServiceClient rosPositionSrv;
+  private: ros::ServiceClient rosBallMoverSrv;
 
   // Pointer to the update event connection
   private: event::ConnectionPtr updateConnection;

@@ -1,9 +1,6 @@
 #include <gazebo/common/Plugin.hh>
 #include <ros/ros.h>
 #include "gazebo_ros_link_attacher.h"
-#include "gazebo_ros_link_attacher/Attach.h"
-#include "gazebo_ros_link_attacher/AttachRequest.h"
-#include "gazebo_ros_link_attacher/AttachResponse.h"
 #include <ignition/math/Pose3.hh>
 
 namespace gazebo

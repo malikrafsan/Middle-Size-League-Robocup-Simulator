@@ -58,6 +58,7 @@ find_package(catkin REQUIRED
 add_service_files(
   FILES
   Attach.srv
+  MoveBall.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -227,3 +228,6 @@ target_link_libraries(goal_out_detection ${GAZEBO_LIBRARIES} )
 
 add_library(pass_ball SHARED plugins/pass_ball.cc)
 target_link_libraries(pass_ball ${GAZEBO_LIBRARIES} )
+
+add_library(move_ball SHARED plugins/move_ball.cc)
+target_link_libraries(move_ball ${GAZEBO_LIBRARIES} )
