@@ -19,7 +19,7 @@
 
 namespace gazebo
 {
-class BallController : public WorldPlugin
+class BallController : public ModelPlugin
 {
 
   public : BallController() :
@@ -27,16 +27,15 @@ class BallController : public WorldPlugin
   {
   }
 
-  public: void Load(physics::WorldPtr _parent, sdf::ElementPtr /*_sdf*/)
+  public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
   {
-    this->world = _parent;
-    this->ball = world->ModelByName("ball");
+    this->model = _parent;
 
     if (!ros::isInitialized())
     {
         int argc = 0;
         char **argv = NULL;
-        ros::init(argc, argv, "move_ball",
+        ros::init(argc, argv, "ball_controller",
         ros::init_options::NoSigintHandler);
     }
 
@@ -48,7 +47,7 @@ class BallController : public WorldPlugin
 
     public: bool stop_ball_callback(std_srvs::EmptyRequest &req, std_srvs::EmptyResponse &res){
       ROS_INFO_STREAM("Received request to stop ball");
-      this->ball->SetLinearVel(ignition::math::Vector3d(0, 0, 0));
+      this->model->SetLinearVel(ignition::math::Vector3d(0, 0, 0));
       return true;
     }
 
@@ -74,7 +73,7 @@ class BallController : public WorldPlugin
       double velY = (target_position.response.pose.position.y - ball_position.response.pose.position.y);
 
 
-      this->ball->SetLinearVel(ignition::math::Vector3d(velX, velY, 1.5));
+      this->model->SetLinearVel(ignition::math::Vector3d(velX, velY, 1.5));
 
       res.ok = true;
 
@@ -85,15 +84,13 @@ class BallController : public WorldPlugin
   private: ros::NodeHandle nh; 
 
   private: ros::ServiceClient rosPositionSrvClient;
-  private: ros::ServiceClient resetWorldSrv;
 
-  private: physics::WorldPtr world;
-  private: physics::ModelPtr ball;
+  private: physics::ModelPtr model;
 
   private: ros::ServiceServer moveBallServicePublisher;
   private: ros::ServiceServer stopBallServicePublisher;
 };
 
 // Register this plugin with the simulator
-GZ_REGISTER_WORLD_PLUGIN(BallController)
+GZ_REGISTER_MODEL_PLUGIN(BallController)
 }
