@@ -15,13 +15,14 @@
 #include "ssl_robocup_gazebo/MoveBall.h"
 #include "ssl_robocup_gazebo/MoveBallRequest.h"
 #include "ssl_robocup_gazebo/MoveBallResponse.h"
+#include <std_srvs/Empty.h>
 
 namespace gazebo
 {
-class MoveBall : public WorldPlugin
+class BallController : public WorldPlugin
 {
 
-  public : MoveBall() :
+  public : BallController() :
     nh("kinetics")
   {
   }
@@ -39,11 +40,19 @@ class MoveBall : public WorldPlugin
         ros::init_options::NoSigintHandler);
     }
 
-    this->shootingServicePublisher = this->nh.advertiseService("move_ball", &MoveBall::move_ball_callback, this);
+    this->moveBallServicePublisher = this->nh.advertiseService("move_ball", &BallController::move_ball_callback, this);
+    this->stopBallServicePublisher = this->nh.advertiseService("stop_ball", &BallController::stop_ball_callback, this);
 
     this->rosPositionSrvClient = this->nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
   }
 
+    public: bool stop_ball_callback(std_srvs::EmptyRequest &req, std_srvs::EmptyResponse &res){
+      ROS_INFO_STREAM("Received request to stop ball");
+      this->ball->SetLinearVel(ignition::math::Vector3d(0, 0, 0));
+      return true;
+    }
+
+      // std_srvs::Empty resetWorldSrv;
     public: bool move_ball_callback(ssl_robocup_gazebo::MoveBall::Request &req,
                                              ssl_robocup_gazebo::MoveBall::Response &res){
       ROS_INFO_STREAM("Received request to move ball  from model: '" << req.target_model_name 
@@ -64,6 +73,7 @@ class MoveBall : public WorldPlugin
       double velX = (target_position.response.pose.position.x - ball_position.response.pose.position.x);
       double velY = (target_position.response.pose.position.y - ball_position.response.pose.position.y);
 
+
       this->ball->SetLinearVel(ignition::math::Vector3d(velX, velY, 1.5));
 
       res.ok = true;
@@ -80,9 +90,10 @@ class MoveBall : public WorldPlugin
   private: physics::WorldPtr world;
   private: physics::ModelPtr ball;
 
-  private: ros::ServiceServer shootingServicePublisher;
+  private: ros::ServiceServer moveBallServicePublisher;
+  private: ros::ServiceServer stopBallServicePublisher;
 };
 
 // Register this plugin with the simulator
-GZ_REGISTER_WORLD_PLUGIN(MoveBall)
+GZ_REGISTER_WORLD_PLUGIN(BallController)
 }

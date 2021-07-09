@@ -229,5 +229,5 @@ target_link_libraries(goal_out_detection ${GAZEBO_LIBRARIES} )
 add_library(pass_ball SHARED plugins/pass_ball.cc)
 target_link_libraries(pass_ball ${GAZEBO_LIBRARIES} )
 
-add_library(move_ball SHARED plugins/move_ball.cc)
-target_link_libraries(move_ball ${GAZEBO_LIBRARIES} )
+add_library(ball_controller SHARED plugins/ball_controller.cc)
+target_link_libraries(ball_controller ${GAZEBO_LIBRARIES} )
