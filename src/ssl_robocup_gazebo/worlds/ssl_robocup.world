@@ -34,21 +34,22 @@
     </include>
     <!-- Turtlebot 1 -->
     <include>
-      <pose>1 0 0 0 0 0</pose>
+      <pose>3 -1 0 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot1</name>
-      <plugin name="model_push" filename="libmodel_push.so"/>
+      <!-- <plugin name="model_push" filename="libmodel_push.so"/> -->
+      <plugin name="pass_ball" filename="libpass_ball.so"/>
     </include>
     <!-- Turtlebot 2 -->
     <include>
       <pose>0 1 0 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot2</name>
-      <plugin name="follow_ball" filename="libfollow_ball.so"/>
+      <!-- <plugin name="follow_ball" filename="libfollow_ball.so"/> -->
     </include>
     <!-- Turtlebot 3 -->
     <include>
-      <pose>0 -1 0 0 0 0</pose>
+      <pose>-3 -1 0 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot3</name>
     </include>
