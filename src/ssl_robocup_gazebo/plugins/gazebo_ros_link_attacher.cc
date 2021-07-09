@@ -1,9 +1,9 @@
 #include <gazebo/common/Plugin.hh>
 #include <ros/ros.h>
 #include "gazebo_ros_link_attacher.h"
-#include "ssl_robocup_gazebo/Attach.h"
-#include "ssl_robocup_gazebo/AttachRequest.h"
-#include "ssl_robocup_gazebo/AttachResponse.h"
+#include "gazebo_ros_link_attacher/Attach.h"
+#include "gazebo_ros_link_attacher/AttachRequest.h"
+#include "gazebo_ros_link_attacher/AttachResponse.h"
 #include <ignition/math/Pose3.hh>
 
 namespace gazebo
@@ -174,8 +174,8 @@ namespace gazebo
 
   }
 
-  bool GazeboRosLinkAttacher::attach_callback(ssl_robocup_gazebo::Attach::Request &req,
-                                              ssl_robocup_gazebo::Attach::Response &res)
+  bool GazeboRosLinkAttacher::attach_callback(gazebo_ros_link_attacher::Attach::Request &req,
+                                              gazebo_ros_link_attacher::Attach::Response &res)
   {
     ROS_INFO_STREAM("Received request to attach model: '" << req.model_name_1
                     << "' using link: '" << req.link_name_1 << "' with model: '"
@@ -193,8 +193,8 @@ namespace gazebo
 
   }
 
-  bool GazeboRosLinkAttacher::detach_callback(ssl_robocup_gazebo::Attach::Request &req,
-                                              ssl_robocup_gazebo::Attach::Response &res){
+  bool GazeboRosLinkAttacher::detach_callback(gazebo_ros_link_attacher::Attach::Request &req,
+                                              gazebo_ros_link_attacher::Attach::Response &res){
       ROS_INFO_STREAM("Received request to detach model: '" << req.model_name_1
                       << "' using link: '" << req.link_name_1 << "' with model: '"
                       << req.model_name_2 << "' using link: '" <<  req.link_name_2 << "'");
