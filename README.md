@@ -81,8 +81,15 @@
     cmake ../
     make
     ```
+    If you get error, see [Notes](#notes)
 5. Run using `roslaunch`
     ```
     roslaunch ssl_robocup_gazebo ssl_robocup.launch 
     ```
 
+## Notes
+- Try delete `build` and `devel` folder first and compile again from `catkin_make`
+- If still error, try to change codes for include header file using relative path, something like:
+    ```cpp
+    #include "../../../devel/include/ssl_robocup_gazebo/MoveBall.h"
+    ```
