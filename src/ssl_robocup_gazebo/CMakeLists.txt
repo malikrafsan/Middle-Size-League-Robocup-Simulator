@@ -227,6 +227,9 @@ target_link_libraries(follow_ball ${GAZEBO_LIBRARIES})
 add_library(goal_out_detection SHARED plugins/goal_out_detection.cc)
 target_link_libraries(goal_out_detection ${GAZEBO_LIBRARIES} )
 
+add_library(set_orient_and_chase SHARED plugins/set_orient_and_chase.cc)
+target_link_libraries(set_orient_and_chase ${GAZEBO_LIBRARIES} )
+
 add_library(pass_ball SHARED plugins/pass_ball.cc)
 target_link_libraries(pass_ball ${GAZEBO_LIBRARIES} )
 

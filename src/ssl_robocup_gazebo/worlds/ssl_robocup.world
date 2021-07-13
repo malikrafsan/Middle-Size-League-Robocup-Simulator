@@ -2,11 +2,11 @@
 <sdf version="1.4">
   <world name="default">
     <plugin name="ros_link_attacher_plugin" filename="libgazebo_ros_link_attacher.so"/>
-    <!-- A global light source -->
+    <!-- A ground plane -->
     <include>
       <uri>model://ground_plane</uri>
     </include>
-    <!-- A ground plane -->
+    <!-- A global light source-->
     <include>
       <uri>model://sun</uri>
     </include>
@@ -28,29 +28,30 @@
     </include>
     <!-- RoboCup SPL ball -->
     <include>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 0.0315 0 0 0</pose>
       <uri>model://robocup_ssl_ball</uri>
       <name>ball</name>
       <plugin name="ball_controller" filename="libball_controller.so"/>
     </include>
     <!-- Turtlebot 1 -->
     <include>
-      <pose>3 -1 0 0 0 0</pose>
+      <pose>4 2 0.01 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot1</name>
       <!-- <plugin name="model_push" filename="libmodel_push.so"/> -->
       <!-- <plugin name="pass_ball" filename="libpass_ball.so"/> -->
+      <plugin name="set_orient_and_chase" filename="libset_orient_and_chase.so"/>
     </include>
     <!-- Turtlebot 2 -->
     <include>
-      <pose>0 1 0 0 0 -1.5708</pose>
+      <pose>0 1 0.01 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot2</name>
       <plugin name="follow_ball" filename="libfollow_ball.so"/>
     </include>
     <!-- Turtlebot 3 -->
     <include>
-      <pose>-3 -1.5 0 0 0 1.5708</pose>
+      <pose>-3 -1 0.01 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot3</name>
       <plugin name="make_goal" filename="libmake_goal.so"/>

@@ -64,6 +64,12 @@
     - Get the teammate robot ModelPtr and store it
     - Find position such that the ball, the model robot, and the teammate robot are in one line, then go to that position
     - Check whether the distance between the ball and the robot is below the threshold, if below, kick (set linear velocity of) the ball 
+12. Implement `set_orient_and_chase` plugin to adjust orientation of robot first and then accelerate towards the ball then slow down when it is close to the ball
+    - Calculate magnitude of distance and velocity of the robot
+    - Calculate angle between robot and the ball then different orientation between them
+    - Adjust orientation of the robot until the different angle is below threshold
+    - If magnitude of distance is bigger than magnitude of velocity, set constant force to 3 Newton, using magnitude normalization
+    - If magnitude of distance is smaller than magnitude of velocity, slow down using dropping linear velocity (deceleration)
 
 ## How to run
 1. Clone this repository
@@ -81,8 +87,15 @@
     cmake ../
     make
     ```
+    If you get error, see [Notes](#notes)
 5. Run using `roslaunch`
     ```
     roslaunch ssl_robocup_gazebo ssl_robocup.launch 
     ```
 
+## Notes
+- Try delete `build` and `devel` folder first and compile again from `catkin_make`
+- If still error, try to change codes for include header file using relative path, something like:
+    ```cpp
+    #include "../../../devel/include/ssl_robocup_gazebo/MoveBall.h"
+    ```
