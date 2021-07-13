@@ -52,6 +52,7 @@ class SetOrient : public ModelPlugin
       m.getRPY(roll, pitch, yaw);
   
       double difOrient = angle - yaw;
+      ROS_INFO_STREAM(difOrient);
 
       if (difOrient > 0.03 || difOrient < -0.03) {
           this->model->SetAngularVel(ignition::math::Vector3d(0, 0, difOrient));
