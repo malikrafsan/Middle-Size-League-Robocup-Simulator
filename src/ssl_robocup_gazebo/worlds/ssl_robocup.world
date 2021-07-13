@@ -39,14 +39,14 @@
       <uri>model://turtlebot</uri>
       <name>turtlebot1</name>
       <!-- <plugin name="model_push" filename="libmodel_push.so"/> -->
-      <plugin name="pass_ball" filename="libpass_ball.so"/>
+      <!-- <plugin name="pass_ball" filename="libpass_ball.so"/> -->
     </include>
     <!-- Turtlebot 2 -->
     <include>
-      <pose>0 1 0 0 0 0</pose>
+      <pose>0 1 0 0 0 -1.5708</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot2</name>
-      <!-- <plugin name="follow_ball" filename="libfollow_ball.so"/> -->
+      <plugin name="follow_ball" filename="libfollow_ball.so"/>
     </include>
     <!-- Turtlebot 3 -->
     <include>
