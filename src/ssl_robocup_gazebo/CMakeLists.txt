@@ -236,13 +236,11 @@ target_link_libraries(pass_ball ${GAZEBO_LIBRARIES} )
 add_library(ball_controller SHARED plugins/ball_controller.cc)
 target_link_libraries(ball_controller ${GAZEBO_LIBRARIES} )
 
-<<<<<<< HEAD
 add_library(move_to_goal SHARED plugins/move_to_goal.cc)
 target_link_libraries(move_to_goal ${GAZEBO_LIBRARIES} )
-=======
+
 add_library(make_goal SHARED plugins/make_goal.cc)
 target_link_libraries(make_goal ${GAZEBO_LIBRARIES} )
 
 add_library(follow_object SHARED plugins/follow_object.cc)
 target_link_libraries(follow_object ${GAZEBO_LIBRARIES} )
->>>>>>> 85503348a8977083fe8f089e0b42f8569d61a90a
