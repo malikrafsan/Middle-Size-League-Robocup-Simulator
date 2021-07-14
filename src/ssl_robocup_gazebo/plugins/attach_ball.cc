@@ -27,8 +27,8 @@ class AttachBall : public ModelPlugin
         this->rosPositionSrv.call(self_position);
 
         //find distance between ball and robot
-        double dist_x = ally_position.response.pose.position.x - ball_position.response.pose.position.x;
-        double dist_y = ally_position.response.pose.position.y - ball_position.response.pose.position.y;
+        double dist_x = self_position.response.pose.position.x - ball_position.response.pose.position.x;
+        double dist_y = self_position.response.pose.position.y - ball_position.response.pose.position.y;
         
         double dist_xy = std::sqrt(std::pow(dist_x,2) + std::pow(dist_y,2));
 
