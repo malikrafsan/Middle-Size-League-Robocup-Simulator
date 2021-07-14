@@ -4,7 +4,7 @@
     <plugin name="ros_link_attacher_plugin" filename="libgazebo_ros_link_attacher.so"/>
     <plugin name="follow_object" filename="libfollow_object.so"/>
     <plugin name="goal_out_detection" filename="libgoal_out_detection.so"/>
-    <plugin name="find_distance" filename="libfind_distance.so"/>
+    <!-- <plugin name="find_distance" filename="libfind_distance.so"/> -->
     <!-- A ground plane -->
     <include>
       <uri>model://ground_plane</uri>
@@ -49,7 +49,7 @@
       <pose>0 1 0.01 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot2</name>
-      <plugin name="move_to_goal" filename="libmove_to_goal.so"/>
+      <!-- <plugin name="move_to_goal" filename="libmove_to_goal.so"/> -->
     </include>
     <!-- Turtlebot 3 -->
     <include>
