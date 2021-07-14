@@ -4,6 +4,7 @@
     <plugin name="ros_link_attacher_plugin" filename="libgazebo_ros_link_attacher.so"/>
     <plugin name="follow_object" filename="libfollow_object.so"/>
     <plugin name="goal_out_detection" filename="libgoal_out_detection.so"/>
+    <plugin name="find_distance" filename="libfind_distance.so"/>
     <!-- A ground plane -->
     <include>
       <uri>model://ground_plane</uri>

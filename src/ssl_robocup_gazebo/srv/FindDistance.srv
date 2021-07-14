@@ -1,0 +1,4 @@
+string target_model_name
+string origin_model_name
+---
+float64 distance

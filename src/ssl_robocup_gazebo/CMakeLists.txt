@@ -61,6 +61,7 @@ add_service_files(
   Attach.srv
   MoveBall.srv
   SetOrient.srv
+  FindDistance.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -244,3 +245,6 @@ target_link_libraries(make_goal ${GAZEBO_LIBRARIES} )
 
 add_library(follow_object SHARED plugins/follow_object.cc)
 target_link_libraries(follow_object ${GAZEBO_LIBRARIES} )
+
+add_library(find_distance SHARED plugins/find_distance.cc)
+target_link_libraries(find_distance ${GAZEBO_LIBRARIES} )
