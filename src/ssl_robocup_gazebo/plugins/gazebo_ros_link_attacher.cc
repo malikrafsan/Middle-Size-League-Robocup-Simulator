@@ -171,8 +171,8 @@ namespace gazebo
 
   }
 
-  bool GazeboRosLinkAttacher::attach_callback(gazebo_ros_link_attacher::Attach::Request &req,
-                                              gazebo_ros_link_attacher::Attach::Response &res)
+  bool GazeboRosLinkAttacher::attach_callback(ssl_robocup_gazebo::Attach::Request &req,
+                                              ssl_robocup_gazebo::Attach::Response &res)
   {
     ROS_INFO_STREAM("Received request to attach model: '" << req.model_name_1
                     << "' using link: '" << req.link_name_1 << "' with model: '"
@@ -190,8 +190,8 @@ namespace gazebo
 
   }
 
-  bool GazeboRosLinkAttacher::detach_callback(gazebo_ros_link_attacher::Attach::Request &req,
-                                              gazebo_ros_link_attacher::Attach::Response &res){
+  bool GazeboRosLinkAttacher::detach_callback(ssl_robocup_gazebo::Attach::Request &req,
+                                              ssl_robocup_gazebo::Attach::Response &res){
       ROS_INFO_STREAM("Received request to detach model: '" << req.model_name_1
                       << "' using link: '" << req.link_name_1 << "' with model: '"
                       << req.model_name_2 << "' using link: '" <<  req.link_name_2 << "'");
