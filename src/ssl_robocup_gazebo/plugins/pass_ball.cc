@@ -49,7 +49,7 @@ class KickBall : public ModelPlugin
 
       double posY = ball_position.response.pose.position.y - gradien * (ball_position.response.pose.position.x - posX);
 
-      this->model->SetLinearVel(ignition::math::Vector3d((posX - self_position.response.pose.position.x)*2, (posY - self_position.response.pose.position.y)*2, 0));
+      // this->model->SetLinearVel(ignition::math::Vector3d((posX - self_position.response.pose.position.x)*2, (posY - self_position.response.pose.position.y)*2, 0));
 
       double distanceX = posX - self_position.response.pose.position.x;
       double distanceY = posY - self_position.response.pose.position.y;

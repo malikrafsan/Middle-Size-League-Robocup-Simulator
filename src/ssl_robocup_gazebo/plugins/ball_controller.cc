@@ -72,7 +72,6 @@ class BallController : public ModelPlugin
       double velX = (target_position.response.pose.position.x - ball_position.response.pose.position.x);
       double velY = (target_position.response.pose.position.y - ball_position.response.pose.position.y);
 
-
       this->model->SetLinearVel(ignition::math::Vector3d(velX*2, velY*2, 1.5));
 
       res.ok = true;

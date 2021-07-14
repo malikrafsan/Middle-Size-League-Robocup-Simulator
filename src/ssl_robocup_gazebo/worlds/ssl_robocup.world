@@ -2,6 +2,8 @@
 <sdf version="1.4">
   <world name="default">
     <plugin name="ros_link_attacher_plugin" filename="libgazebo_ros_link_attacher.so"/>
+    <plugin name="follow_object" filename="libfollow_object.so"/>
+    <plugin name="goal_out_detection" filename="libgoal_out_detection.so"/>
     <!-- A ground plane -->
     <include>
       <uri>model://ground_plane</uri>
@@ -39,7 +41,6 @@
       <uri>model://turtlebot</uri>
       <name>turtlebot1</name>
       <!-- <plugin name="model_push" filename="libmodel_push.so"/> -->
-      <!-- <plugin name="pass_ball" filename="libpass_ball.so"/> -->
       <plugin name="set_orient_and_chase" filename="libset_orient_and_chase.so"/>
     </include>
     <!-- Turtlebot 2 -->
@@ -47,15 +48,14 @@
       <pose>0 1 0.01 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot2</name>
-      <plugin name="follow_ball" filename="libfollow_ball.so"/>
+      <!-- <plugin name="follow_ball" filename="libfollow_ball.so"/> -->
     </include>
     <!-- Turtlebot 3 -->
     <include>
-      <pose>-3 -1 0.01 0 0 0</pose>
+      <pose>-3 -1 0.01 0 0 -1.52</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot3</name>
       <plugin name="make_goal" filename="libmake_goal.so"/>
     </include>
-    <plugin name="goal_out_detection" filename="libgoal_out_detection.so"/>
   </world>
 </sdf>
