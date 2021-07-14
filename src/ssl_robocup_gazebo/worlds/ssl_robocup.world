@@ -46,7 +46,7 @@
       <pose>0 1 0 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot2</name>
-      <!-- <plugin name="follow_ball" filename="libfollow_ball.so"/> -->
+      <plugin name="move_to_goal" filename="libmove_to_goal.so"/>
     </include>
     <!-- Turtlebot 3 -->
     <include>

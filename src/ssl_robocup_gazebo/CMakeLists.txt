@@ -231,3 +231,6 @@ target_link_libraries(pass_ball ${GAZEBO_LIBRARIES} )
 
 add_library(ball_controller SHARED plugins/ball_controller.cc)
 target_link_libraries(ball_controller ${GAZEBO_LIBRARIES} )
+
+add_library(move_to_goal SHARED plugins/move_to_goal.cc)
+target_link_libraries(move_to_goal ${GAZEBO_LIBRARIES} )
