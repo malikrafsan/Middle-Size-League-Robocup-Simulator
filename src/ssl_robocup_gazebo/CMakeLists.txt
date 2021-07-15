@@ -49,11 +49,10 @@ find_package(catkin REQUIRED
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  TestMsg.msg
+)
 
 ## Generate services in the 'srv' folder
 add_service_files(
@@ -248,3 +247,6 @@ target_link_libraries(follow_object ${GAZEBO_LIBRARIES} )
 
 add_library(find_distance SHARED plugins/find_distance.cc)
 target_link_libraries(find_distance ${GAZEBO_LIBRARIES} )
+
+add_library(game_plugin SHARED plugins/game_plugin.cc)
+target_link_libraries(game_plugin ${GAZEBO_LIBRARIES} )
