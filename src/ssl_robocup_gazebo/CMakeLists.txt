@@ -48,12 +48,7 @@ find_package(catkin REQUIRED
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  GameMessage.msg
-  ModelAtGoalRadius.msg
-)
+
 
 ## Generate services in the 'srv' folder
 add_service_files(
@@ -62,6 +57,13 @@ add_service_files(
   MoveBall.srv
   SetOrient.srv
   FindDistance.srv
+)
+
+## Generate messages in the 'msg' folder
+add_message_files(
+  FILES
+  GameMessage.msg
+  ModelAtGoalRadius.msg
 )
 
 ## Generate actions in the 'action' folder
@@ -75,7 +77,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   std_msgs  # Or other packages containing msgs
-)
+  )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

@@ -17,6 +17,9 @@
 #include "nav_msgs/Odometry.h"
 #include <tf/tf.h>
 #include "ssl_robocup_gazebo/GameMessage.h"
+#include "ssl_robocup_gazebo/FindDistance.h"
+#include "ssl_robocup_gazebo/FindDistanceRequest.h"
+#include "ssl_robocup_gazebo/FindDistanceResponse.h"
 
 namespace gazebo
 {
@@ -42,6 +45,7 @@ class GamePlugin : public WorldPlugin
     }
 
     this->rosPub = this->nh.advertise<ssl_robocup_gazebo::GameMessage>("game_info",100);
+    this->rosDistanceSrv = this->nh.serviceClient<ssl_robocup_gazebo::FindDistance>("/kinetics/calculateDist");
 
     this->rosQueueThread =
     std::thread(std::bind(&GamePlugin::QueueThread, this));
@@ -55,16 +59,31 @@ class GamePlugin : public WorldPlugin
         {
             ssl_robocup_gazebo::GameMessage game_message;
             this->rosQueue.callAvailable(ros::WallDuration(timeout));
-            game_message.ball_holder= this->ball_holder;
+            game_message.ball_holder= this->ball_holder.c_str();
+            game_message.model_at_goal_radius.A_robot1 = this->checkRadiusToGoal("turtlebot1");
+            game_message.model_at_goal_radius.A_robot2 = this->checkRadiusToGoal("turtlebot2");
+            game_message.model_at_goal_radius.A_robot3 = this->checkRadiusToGoal("turtlebot3");
             this->rosPub.publish(game_message);
         }
+    }
+
+    private: bool checkRadiusToGoal(std::string model_name){
+      ssl_robocup_gazebo::FindDistance distance_msg; 
+      distance_msg.request.target_model_name = "robocup_ssl_left_goal";
+      distance_msg.request.origin_model_name = model_name;
+      double distanceToGoal = this->rosDistanceSrv.call(distance_msg);
+      if(distance_msg.response.distance < 1.75){
+        return true;
+      }
+      return false;
     }
   
 
   /// \brief A node use for ROS transport
   private: ros::NodeHandle nh; 
 
-  /// \brief A ROS subscriber
+  private: ros::ServiceClient rosDistanceSrv;
+
   private: ros::Publisher rosPub;
 
   /// \brief A ROS callbackqueue that helps process messages
@@ -73,8 +92,6 @@ class GamePlugin : public WorldPlugin
   /// \brief A thread the keeps running the rosQueue
   private: std::thread rosQueueThread;
 
-  /// \brief A ROS service client
-  private: ros::ServiceClient rosPositionSrv;
 
   /// \brief A ROS service publisher 
   private: ros::ServiceServer setOrientPublisher;
