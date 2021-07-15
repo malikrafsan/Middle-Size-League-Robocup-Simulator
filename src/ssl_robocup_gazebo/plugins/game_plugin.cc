@@ -16,7 +16,7 @@
 #include "geometry_msgs/Quaternion.h"
 #include "nav_msgs/Odometry.h"
 #include <tf/tf.h>
-#include "ssl_robocup_gazebo/TestMsg.h"
+#include "ssl_robocup_gazebo/GameMessage.h"
 
 namespace gazebo
 {
@@ -25,6 +25,7 @@ class GamePlugin : public WorldPlugin
   public : GamePlugin() :
     nh("game_plugin")
   {
+    this->ball_holder = "None";
   }
 
   public: void Load(physics::WorldPtr _parent, sdf::ElementPtr /*_sdf*/)
@@ -40,7 +41,7 @@ class GamePlugin : public WorldPlugin
         ros::init_options::NoSigintHandler);
     }
 
-    this->rosPub = this->nh.advertise<ssl_robocup_gazebo::TestMsg>("test",100);
+    this->rosPub = this->nh.advertise<ssl_robocup_gazebo::GameMessage>("game_info",100);
 
     this->rosQueueThread =
     std::thread(std::bind(&GamePlugin::QueueThread, this));
@@ -52,10 +53,10 @@ class GamePlugin : public WorldPlugin
         static const double timeout = 0.01;
         while (this->nh.ok())
         {
-            ssl_robocup_gazebo::TestMsg test_msg;
+            ssl_robocup_gazebo::GameMessage game_message;
             this->rosQueue.callAvailable(ros::WallDuration(timeout));
-            test_msg.payload = "hello";
-            this->rosPub.publish(test_msg);
+            game_message.ball_holder= this->ball_holder;
+            this->rosPub.publish(game_message);
         }
     }
   
@@ -85,7 +86,7 @@ class GamePlugin : public WorldPlugin
 
   private: physics::WorldPtr world;
   
-  private: physics::ModelPtr ball;
+  private: std::string ball_holder;
 
   private: physics::ModelPtr ally;
 };
