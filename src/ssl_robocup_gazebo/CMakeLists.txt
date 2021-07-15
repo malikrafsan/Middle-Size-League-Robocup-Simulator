@@ -48,12 +48,7 @@ find_package(catkin REQUIRED
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+
 
 ## Generate services in the 'srv' folder
 add_service_files(
@@ -62,6 +57,13 @@ add_service_files(
   MoveBall.srv
   SetOrient.srv
   FindDistance.srv
+)
+
+## Generate messages in the 'msg' folder
+add_message_files(
+  FILES
+  GameMessage.msg
+  ModelAtGoalRadius.msg
 )
 
 ## Generate actions in the 'action' folder
@@ -75,7 +77,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   std_msgs  # Or other packages containing msgs
-)
+  )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -248,6 +250,9 @@ target_link_libraries(follow_object ${GAZEBO_LIBRARIES} )
 
 add_library(find_distance SHARED plugins/find_distance.cc)
 target_link_libraries(find_distance ${GAZEBO_LIBRARIES} )
+
+add_library(game_plugin SHARED plugins/game_plugin.cc)
+target_link_libraries(game_plugin ${GAZEBO_LIBRARIES} )
 
 add_library(behavior_tree SHARED plugins/behavior_tree.cc)
 target_link_libraries(behavior_tree ${GAZEBO_LIBRARIES} )
