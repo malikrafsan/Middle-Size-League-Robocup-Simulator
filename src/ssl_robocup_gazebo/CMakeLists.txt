@@ -248,3 +248,6 @@ target_link_libraries(follow_object ${GAZEBO_LIBRARIES} )
 
 add_library(find_distance SHARED plugins/find_distance.cc)
 target_link_libraries(find_distance ${GAZEBO_LIBRARIES} )
+
+add_library(behavior_tree SHARED plugins/behavior_tree.cc)
+target_link_libraries(behavior_tree ${GAZEBO_LIBRARIES} )
