@@ -43,7 +43,8 @@
       <uri>model://turtlebot</uri>
       <name>turtlebot1</name>
       <!-- <plugin name="model_push" filename="libmodel_push.so"/> -->
-      <plugin name="set_orient_and_chase" filename="libset_orient_and_chase.so"/>
+      <!-- <plugin name="set_orient_and_chase" filename="libset_orient_and_chase.so"/> -->
+      <plugin name="behavior_tree" filename="libbehavior_tree.so"/>
     </include>
     <!-- Turtlebot 2 -->
     <include>
@@ -57,7 +58,7 @@
       <pose>-3 -1 0.01 0 0 -1.52</pose>
       <uri>model://turtlebot</uri>
       <name>turtlebot3</name>
-      <plugin name="make_goal" filename="libmake_goal.so"/>
+      <!-- <plugin name="make_goal" filename="libmake_goal.so"/> -->
     </include>
   </world>
 </sdf>

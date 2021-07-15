@@ -61,6 +61,12 @@ namespace gazebo
         private: void chase(std::string chased)
         {
             // Call service to move this robot to chased object
+            ssl_robocup_gazebo::SetOrient chasing;
+            chasing.request.origin_model_name = this->modelName;
+            chasing.request.origin_link_name = "rack";
+            chasing.request.target_model_name = chased;
+            this->rosChaserSrv.call(chasing);
+
             ROS_INFO("%s is chased", chased.c_str());
         }
 
@@ -182,7 +188,7 @@ namespace gazebo
             this->rosNode.reset(new ros::NodeHandle("behavior_tree"));
             this->rosChaserSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::SetOrient>("/kinetics/set_orient_n_chase");
             this->rosDistSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::FindDistance>("/kinetics/calculateDist");
-            
+
             this->modelName = this->model->GetName().c_str();
             whichGoal(this->modelName);
             // setSpecLoc();
