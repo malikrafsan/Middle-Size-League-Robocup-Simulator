@@ -122,11 +122,7 @@ namespace gazebo
             double distGoalRobot[3];
             for (int i=0;i<3;i++)
             {
-                ssl_robocup_gazebo::FindDistance dist;
-                dist.request.origin_model_name = this->enemyGoal;
-                dist.request.target_model_name = arrRobotName[i];
-                this->rosDistSrv.call(dist);
-                distGoalRobot[i] = dist.response.distance;
+                distGoalRobot[i] = calculateDist(this->enemyGoal,arrRobotName[i]);
             }
             int minIndex = 2;
             for (int j=0;j<2;j++)
@@ -134,6 +130,20 @@ namespace gazebo
                 if (distGoalRobot[j] < distGoalRobot[minIndex]) { minIndex = j; }
             }
             return arrRobotName[minIndex];
+        }
+
+        private: double calculateDist(std::string origin, std::string target)
+        {
+            ssl_robocup_gazebo::FindDistance dist;
+            dist.request.origin_model_name = origin;
+            dist.request.target_model_name = target;
+            this->rosDistSrv.call(dist);
+            return dist.response.distance;
+        }
+
+        private: void moveSpecLoc()
+        {
+            // Call service to move this robot to spesific location
         }
 
         public: void OnUpdate()
@@ -163,9 +173,7 @@ namespace gazebo
 
                 // Ally of this robot hold the ball
                 case 2:
-                    chase(this->enemyGoal); 
-                    // TEMPORARY, TRY MOVING TO SPECIFIC LOCATION
-                    // BUT WE MUST CREATE NEW MECHANISM TO DO IT
+                    moveSpecLoc();
                     break;
 
                 // Enemy of this robot hold the ball
