@@ -31,6 +31,7 @@ namespace gazebo
         private: ros::ServiceClient rosChaserSrv;
         private: ros::ServiceClient rosDistSrv;
         private: ros::ServiceClient rosAttachSrv;
+        private: ros::ServiceClient rosKickSrv;     
         private: physics::ModelPtr model;
         private: event::ConnectionPtr updateConnection;
         private: std::string modelName;
@@ -100,7 +101,15 @@ namespace gazebo
 
         private: void kickBall(std::string targetName)
         {
+            // Call service to detach the ball from this
+
             // Call service to kick the ball to target object
+            ssl_robocup_gazebo::MoveBall kicking;
+            kicking.request.origin_model_name = this->modelName;
+            kicking.request.target_model_name = targetName;
+            this->rosKickSrv.call(kicking);
+
+            ROS_INFO("ball is kicked to %s", targetName.c_str());
         }
 
         private: std::string whoCloseToGoal()
@@ -196,6 +205,7 @@ namespace gazebo
             this->rosNode.reset(new ros::NodeHandle("behavior_tree"));
             this->rosChaserSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::SetOrient>("/kinetics/set_orient_n_chase");
             this->rosDistSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::FindDistance>("/kinetics/calculateDist");
+            this->rosKickSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveBall>("/kinetics/move_ball");
 
             this->modelName = this->model->GetName().c_str();
             whichGoal(this->modelName);
