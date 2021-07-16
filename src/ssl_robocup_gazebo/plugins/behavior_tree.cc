@@ -21,6 +21,9 @@
 #include "ssl_robocup_gazebo/Attach.h"
 #include "ssl_robocup_gazebo/AttachRequest.h"
 #include "ssl_robocup_gazebo/AttachResponse.h"
+#include "ssl_robocup_gazebo/MoveToCoord.h"
+#include "ssl_robocup_gazebo/MoveToCoordRequest.h"
+#include "ssl_robocup_gazebo/MoveToCoordResponse.h"
 #include <string>
 
 namespace gazebo
@@ -31,7 +34,8 @@ namespace gazebo
         private: ros::ServiceClient rosChaserSrv;
         private: ros::ServiceClient rosDistSrv;
         private: ros::ServiceClient rosAttachSrv;
-        private: ros::ServiceClient rosKickSrv;     
+        private: ros::ServiceClient rosKickSrv;
+        private: ros::ServiceClient rosMoveSrv;        
         private: physics::ModelPtr model;
         private: event::ConnectionPtr updateConnection;
         private: std::string modelName;
@@ -153,6 +157,16 @@ namespace gazebo
         private: void moveSpecLoc()
         {
             // Call service to move this robot to spesific location
+            // SPECIFIC LOCATION
+            // ADD LOGIC LATER TO DIFFERENTIATE TEAM A AND B
+            double xLoc = 3.0, yLoc = -3.0;
+
+            ssl_robocup_gazebo::MoveToCoord move;
+            move.request.origin_model_name = this->modelName;
+            move.request.origin_link_name = "rack";
+            move.request.target_x_coordinate = xLoc;
+            move.request.target_y_coordinate = yLoc;
+            this->rosMoveSrv.call(move);
         }
 
         public: void OnUpdate()
@@ -206,6 +220,7 @@ namespace gazebo
             this->rosChaserSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::SetOrient>("/kinetics/set_orient_n_chase");
             this->rosDistSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::FindDistance>("/kinetics/calculateDist");
             this->rosKickSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveBall>("/kinetics/move_ball");
+            this->rosMoveSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveToCoord>("/kinetics/move_to_coord");
 
             this->modelName = this->model->GetName().c_str();
             whichGoal(this->modelName);
