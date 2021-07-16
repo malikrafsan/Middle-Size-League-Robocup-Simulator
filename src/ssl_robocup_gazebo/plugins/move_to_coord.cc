@@ -49,6 +49,7 @@ class MoveToCoord : public WorldPlugin
     gazebo_msgs::GetModelState self_state;  
     self_state.request.model_name = req.origin_model_name;
     this->rosPositionSrv.call(self_state);
+    this->origin = world->ModelByName(req.origin_model_name);
 
     double x_difference = req.target_x_coordinate - self_state.response.pose.position.x; 
     double y_difference = req.target_y_coordinate - self_state.response.pose.position.y;
