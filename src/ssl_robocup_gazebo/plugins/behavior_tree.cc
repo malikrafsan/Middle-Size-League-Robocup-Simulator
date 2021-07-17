@@ -73,7 +73,7 @@ namespace gazebo
             }
 
             if (this->modelName[0] == 'B') { this->specificLoc[0] = - this->specificLoc[0]; }
-            ROS_INFO("SPECIFIC LOCATION: %lf", this->specificLoc[0]);
+            // ROS_INFO("SPECIFIC LOCATION: %lf", this->specificLoc[0]);
         }
 
         private: void chase(std::string chased)
@@ -110,10 +110,22 @@ namespace gazebo
             }
         }
 
-        private: bool modelInGoalRadius(std::string modelName)
+        private: bool modelInGoalRadius(std::string modelName, const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
         {
-            // Call service to check whether the model is in goal radius
-            return false;
+            // Subscribe to messages to check whether the model is in goal radius
+            bool arrayTrueFalse[6];
+
+            arrayTrueFalse[0] = _msg->model_at_goal_radius.A_robot1;
+            arrayTrueFalse[1] = _msg->model_at_goal_radius.A_robot2;
+            arrayTrueFalse[2] = _msg->model_at_goal_radius.A_robot3;
+            arrayTrueFalse[3] = _msg->model_at_goal_radius.B_robot1;
+            arrayTrueFalse[4] = _msg->model_at_goal_radius.B_robot2;
+            arrayTrueFalse[5] = _msg->model_at_goal_radius.B_robot3;
+
+            int index = this->modelName[7] - 49;
+            if (this->modelName[0] == 'B') { index += 3; }
+
+            return arrayTrueFalse[index];
         }
 
         private: void kickBall(std::string targetName)
@@ -181,8 +193,7 @@ namespace gazebo
 
         public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
         {
-            this->ballHolder = _msg->ball_holder; //whoHoldBall();
-            //ROS_INFO("BALL HOLDER: %s", this->ballHolder.c_str());
+            this->ballHolder = _msg->ball_holder;
             int switching = isMeAllyEnemy(this->ballHolder);
             switch (switching)
             {
@@ -194,7 +205,7 @@ namespace gazebo
                 // This robot hold the ball
                 case 1:
                 {
-                    bool inGoalRadia = modelInGoalRadius(this->modelName);
+                    int inGoalRadia = modelInGoalRadius(this->modelName, _msg);
                     if (inGoalRadia) { kickBall(this->enemyGoal); }
                     else 
                     {
