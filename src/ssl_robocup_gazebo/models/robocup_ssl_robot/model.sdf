@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <model name="RoboCup SSL Robot">
+    <!-- <pose>0 0 -0.077973 1.570796 0 -1.570796</pose> -->
+    <static>false</static>
+    <link name="rack">
+      <inertial>
+        <inertia>
+          <!-- <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz> -->
+          <ixx>0</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0</izz>
+        </inertia>
+        <mass>2.246</mass>
+      </inertial>
+      <collision name="collision">
+        <pose>0 0 -0.077973 1.570796 0 -1.570796</pose>
+        <geometry>
+          <mesh>
+            <scale>0.01 0.01 0.01</scale>
+            <uri>model://robocup_ssl_robot/meshes/robot1.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <pose>0 0 -0.077973 1.570796 0 -1.570796</pose>
+        <geometry>
+          <mesh>
+            <scale>0.01 0.01 0.01</scale>
+            <uri>model://robocup_ssl_robot/meshes/robot1.stl</uri>
+          </mesh>
+        </geometry>
+        <!-- <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Orange</name>
+          </script>
+        </material> -->
+      </visual>
+    </link>
+  </model>
+</sdf>
