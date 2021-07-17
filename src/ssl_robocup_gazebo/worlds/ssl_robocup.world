@@ -61,7 +61,7 @@
     </include>
     <!-- B_robot2 -->
     <include>
-      <pose>2 0 0 0 0 0</pose>
+      <pose>-0.5 0 0 0 0 0</pose>
       <uri>model://turtlebot</uri>
       <name>B_robot1</name>
       <plugin name="behavior_tree" filename="libbehavior_tree.so"/>

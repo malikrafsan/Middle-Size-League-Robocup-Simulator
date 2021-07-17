@@ -72,7 +72,7 @@ namespace gazebo
             chasing.request.target_model_name = chased;
             this->rosChaserSrv.call(chasing);
 
-            ROS_INFO("%s is chased", chased.c_str());
+            // ROS_INFO("%s is chased", chased.c_str());
         }
 
         private: std::string whoHoldBall()
@@ -113,7 +113,7 @@ namespace gazebo
             kicking.request.target_model_name = targetName;
             this->rosKickSrv.call(kicking);
 
-            ROS_INFO("ball is kicked to %s", targetName.c_str());
+            // ROS_INFO("ball is kicked to %s", targetName.c_str());
         }
 
         private: std::string whoCloseToGoal()

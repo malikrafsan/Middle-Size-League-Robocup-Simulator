@@ -64,6 +64,7 @@ add_service_files(
   SetOrient.srv
   FindDistance.srv
   MoveToCoord.srv
+  BallHolder.srv
 )
 
 

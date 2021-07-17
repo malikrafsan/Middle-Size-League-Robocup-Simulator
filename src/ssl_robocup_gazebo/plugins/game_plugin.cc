@@ -20,6 +20,9 @@
 #include "ssl_robocup_gazebo/FindDistance.h"
 #include "ssl_robocup_gazebo/FindDistanceRequest.h"
 #include "ssl_robocup_gazebo/FindDistanceResponse.h"
+#include "ssl_robocup_gazebo/BallHolder.h"
+#include "ssl_robocup_gazebo/BallHolderRequest.h"
+#include "ssl_robocup_gazebo/BallHolderResponse.h"
 
 namespace gazebo
 {
@@ -45,7 +48,8 @@ class GamePlugin : public WorldPlugin
     }
 
     this->rosPub = this->nh.advertise<ssl_robocup_gazebo::GameMessage>("game_info",100);
-    this->rosDistanceSrv = this->nh.serviceClient<ssl_robocup_gazebo::FindDistance>("/kinetics/calculateDist");
+    this->rosBallHolderSrvPublisher = this->nh.advertiseService("ball_holder", &GamePlugin::BallHolderCallback, this);
+    this->rosDistanceSrvClient = this->nh.serviceClient<ssl_robocup_gazebo::FindDistance>("/kinetics/calculateDist");
 
     this->rosQueueThread =
     std::thread(std::bind(&GamePlugin::QueueThread, this));
@@ -63,26 +67,41 @@ class GamePlugin : public WorldPlugin
             game_message.model_at_goal_radius.A_robot1 = this->checkRadiusToGoal("A_robot1");
             game_message.model_at_goal_radius.A_robot2 = this->checkRadiusToGoal("A_robot2");
             game_message.model_at_goal_radius.A_robot3 = this->checkRadiusToGoal("A_robot3");
+            game_message.model_at_goal_radius.B_robot1 = this->checkRadiusToGoal("B_robot1");
+            game_message.model_at_goal_radius.B_robot2 = this->checkRadiusToGoal("B_robot2");
+            game_message.model_at_goal_radius.B_robot3 = this->checkRadiusToGoal("B_robot3");
             this->rosPub.publish(game_message);
         }
     }
 
     private: bool checkRadiusToGoal(std::string model_name){
-      ssl_robocup_gazebo::FindDistance distance_msg; 
-      distance_msg.request.target_model_name = "robocup_ssl_right_goal";
+      ssl_robocup_gazebo::FindDistance distance_msg;
+      if(model_name.find("A") != std::string::npos){
+        distance_msg.request.target_model_name = "robocup_ssl_right_goal";
+      } else {
+        distance_msg.request.target_model_name = "robocup_ssl_left_goal";
+      }
       distance_msg.request.origin_model_name = model_name;
-      double distanceToGoal = this->rosDistanceSrv.call(distance_msg);
+      double distanceToGoal = this->rosDistanceSrvClient.call(distance_msg);
       if(distance_msg.response.distance < 1.75){
         return true;
       }
       return false;
+    }
+
+    private: bool BallHolderCallback(ssl_robocup_gazebo::BallHolder::Request &req,
+                                    ssl_robocup_gazebo::BallHolder::Response &res){
+      this->ball_holder = req.model_name;
+      res.ok = true;
+      return true;
     }
   
 
   /// \brief A node use for ROS transport
   private: ros::NodeHandle nh; 
 
-  private: ros::ServiceClient rosDistanceSrv;
+  private: ros::ServiceServer rosBallHolderSrvPublisher;
+  private: ros::ServiceClient rosDistanceSrvClient;
 
   private: ros::Publisher rosPub;
 
