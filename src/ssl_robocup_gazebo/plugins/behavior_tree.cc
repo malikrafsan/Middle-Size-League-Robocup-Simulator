@@ -24,6 +24,8 @@
 #include "ssl_robocup_gazebo/MoveToCoord.h"
 #include "ssl_robocup_gazebo/MoveToCoordRequest.h"
 #include "ssl_robocup_gazebo/MoveToCoordResponse.h"
+#include "ssl_robocup_gazebo/GameMessage.h"
+#include "ros/subscribe_options.h"
 #include <string>
 
 namespace gazebo
@@ -41,6 +43,9 @@ namespace gazebo
         private: std::string modelName;
         private: std::string ballHolder;
         private: std::string enemyGoal;
+        private: ros::Subscriber rosGamePluginSub;
+        private: ros::CallbackQueue rosQueue;
+        private: std::thread rosQueueThread;
         // private: int specificLoc[2];
 
         private: void whichGoal(std::string modelName)
@@ -75,12 +80,12 @@ namespace gazebo
             // ROS_INFO("%s is chased", chased.c_str());
         }
 
-        private: std::string whoHoldBall()
-        {
-            std::string inputHolder = "None"; // REMOVE NONE LATER
-            // Call service to check who hold the ball
-            return inputHolder;
-        }
+        // private: std::string whoHoldBall()
+        // {
+        //     std::string inputHolder = "None"; // REMOVE NONE LATER
+        //     // Call service to check who hold the ball
+        //     return inputHolder;
+        // }
 
         private: int isMeAllyEnemy(std::string inputHolder)
         {
@@ -169,9 +174,10 @@ namespace gazebo
             this->rosMoveSrv.call(move);
         }
 
-        public: void OnUpdate()
+        public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
         {
-            this->ballHolder = whoHoldBall();
+            this->ballHolder = _msg->ball_holder; //whoHoldBall();
+            ROS_INFO("BALL HOLDER: %s", this->ballHolder.c_str());
             int switching = isMeAllyEnemy(this->ballHolder);
             switch (switching)
             {
@@ -205,6 +211,15 @@ namespace gazebo
             }
         }
 
+        private: void QueueThread()
+        {
+            static const double timeout = 0.01;
+            while (this->rosNode->ok())
+            {
+                this->rosQueue.callAvailable(ros::WallDuration(timeout));
+            }
+        }
+
         public: void Load(physics::ModelPtr _parent, sdf::ElementPtr)
         {
             this->model = _parent;
@@ -222,12 +237,21 @@ namespace gazebo
             this->rosKickSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveBall>("/kinetics/move_ball");
             this->rosMoveSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveToCoord>("/kinetics/move_to_coord");
 
+            ros::SubscribeOptions so =
+                ros::SubscribeOptions::create<ssl_robocup_gazebo::GameMessage>(
+                    "/game_plugin/game_info",
+                    1,
+                    boost::bind(&BehaviorTree::OnRosMsg, this, _1),
+                    ros::VoidPtr(), &this->rosQueue);
+            this->rosGamePluginSub = this->rosNode->subscribe(so);
+            this->rosQueueThread = std::thread(std::bind(&BehaviorTree::QueueThread,this));
+
             this->modelName = this->model->GetName().c_str();
             whichGoal(this->modelName);
             // setSpecLoc();
 
-            this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-                std::bind(&BehaviorTree::OnUpdate, this));
+            // this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+            //     std::bind(&BehaviorTree::OnUpdate, this));
         }
     };
     GZ_REGISTER_MODEL_PLUGIN(BehaviorTree)
