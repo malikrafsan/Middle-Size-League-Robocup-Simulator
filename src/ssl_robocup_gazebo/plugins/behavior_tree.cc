@@ -84,10 +84,21 @@ namespace gazebo
             chasing.request.origin_link_name = "rack";
             chasing.request.target_model_name = chased;
             this->rosChaserSrv.call(chasing);
-
+            if(this->ballHolder!="None"){
+                this->handlerDefault();
+            } else {
+                this->handlerNone();
+            }
             // ROS_INFO("%s is chased", chased.c_str());
         }
 
+        private: void handlerDefault(){
+
+        }
+
+        private: void handlerNone(){
+
+        }
         // private: std::string whoHoldBall()
         // {
         //     std::string inputHolder = "None"; // REMOVE NONE LATER

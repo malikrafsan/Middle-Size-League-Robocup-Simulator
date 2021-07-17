@@ -88,6 +88,16 @@ namespace gazebo{
             have_ball = true;
         }
 
+        // jarak deket bola
+        // attach
+        // gerak posisi
+        // detach
+        // moveball
+
+        // musuh deket bola
+        // detach yang megang
+        // attach musuh
+
         // stop at certain distance
         if (dist < 1.75){
           this->model->SetLinearVel(ignition::math::Vector3d(0, 0, 0));
