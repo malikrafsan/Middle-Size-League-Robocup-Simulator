@@ -2,6 +2,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo_msgs/GetModelState.h> 
+#include <gazebo_msgs/SetModelState.h> 
 #include <gazebo/common/common.hh>
 #include <ignition/math/Vector3.hh>
 #include <thread>
@@ -38,7 +39,8 @@ class ResetWorld : public WorldPlugin
     // the Gazebo node
     this->rosNode.reset(new ros::NodeHandle("reset_world"));
 
-    this->rosPositionSrv = this->rosNode->serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+    this->rosGetPositionSrv = this->rosNode->serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+    this->rosSetPositionSrv = this->rosNode->serviceClient<gazebo_msgs::SetModelState>("/gazebo/set_model_state");
     ros::SubscribeOptions so =
     ros::SubscribeOptions::create<ssl_robocup_gazebo::GameMessage>(
         "/game_plugin/game_info",
@@ -54,15 +56,29 @@ class ResetWorld : public WorldPlugin
   public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg){
       gazebo_msgs::GetModelState ball_position ;  
       ball_position.request.model_name = "ball";
-      this->rosPositionSrv.call(ball_position);
+      this->rosGetPositionSrv.call(ball_position);
 
       if (ball_position.response.pose.position.x > 4.5 || ball_position.response.pose.position.x < -4.5 || 
       ball_position.response.pose.position.y > 3 || ball_position.response.pose.position.y < -3)
       {
-          std_srvs::Empty resetWorldSrv;
-          ros::service::call("/gazebo/reset_world", resetWorldSrv);
+          // gazebo_msgs::SetModelState new_ball_position;  
+          // new_ball_position.request.model_state.model_name = "ball";
+          // if(this->rosSetPositionSrv.call(new_ball_position)){
+          //   std::cout << "success" << std::endl;
+          // } else {
+          //   std::cout << "fail" << std::endl;
+          // }
+          std_srvs::Empty rosEmptySrv;
+          // ros::service::call("/gazebo/reset_world", rosEmptySrv);
           if(_msg->ball_holder.find("A") != std::string::npos){
-
+            ros::service::call("/gazebo/pause_physics", rosEmptySrv);
+            // gazebo_msgs::SetModelState new_position; 
+            // new_position.request.model_state.model_name = "A_robot1";
+            // new_position.request.model_state.pose.position.x = 2;
+            // new_position.request.model_state.pose.orientation.z = 3.14;
+            // this->rosSetPositionSrv.call(new_position);
+            // std::cout << new_position.response.success << std::endl;
+            // ros::service::call("/gazebo/unpause_physics", rosEmptySrv);
           } else {
 
           }
@@ -72,7 +88,7 @@ class ResetWorld : public WorldPlugin
 
   private: void QueueThread()
   {
-  static const double timeout = 0.01;
+  static const double timeout = 20;
   while (this->rosNode->ok())
     {
         this->rosQueue.callAvailable(ros::WallDuration(timeout));
@@ -85,8 +101,9 @@ class ResetWorld : public WorldPlugin
   private: std::unique_ptr<ros::NodeHandle> rosNode;
 
   /// \brief A ROS service client
-  private: ros::ServiceClient rosPositionSrv;
-  private: ros::ServiceClient resetWorldSrv;
+  private: ros::ServiceClient rosGetPositionSrv;
+  private: ros::ServiceClient rosSetPositionSrv;
+  private: ros::ServiceClient rosEmptySrv;
 
   private: ros::Subscriber rosGamePluginSub;
 
