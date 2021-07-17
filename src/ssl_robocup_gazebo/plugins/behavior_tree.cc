@@ -27,6 +27,8 @@
 #include "ssl_robocup_gazebo/GameMessage.h"
 #include "ros/subscribe_options.h"
 #include <string>
+#include <unistd.h>
+
 
 namespace gazebo
 {
@@ -36,6 +38,7 @@ namespace gazebo
         private: ros::ServiceClient rosChaserSrv;
         private: ros::ServiceClient rosDistSrv;
         private: ros::ServiceClient rosAttachSrv;
+        private: ros::ServiceClient rosDettachSrv;
         private: ros::ServiceClient rosKickSrv;
         private: ros::ServiceClient rosMoveSrv;        
         private: physics::ModelPtr model;
@@ -46,6 +49,7 @@ namespace gazebo
         private: ros::Subscriber rosGamePluginSub;
         private: ros::CallbackQueue rosQueue;
         private: std::thread rosQueueThread;
+  
         private: double specificLoc[2];
 
         private: void whichGoal(std::string modelName)
@@ -84,21 +88,17 @@ namespace gazebo
             chasing.request.origin_link_name = "rack";
             chasing.request.target_model_name = chased;
             this->rosChaserSrv.call(chasing);
-            if(this->ballHolder!="None"){
+            
+            if(this->ballHolder != "None"){
+                //Case Bola dah dipegang sama musuh -> Rebut 
                 this->handlerDefault();
-            } else {
+            }
+            else{
                 this->handlerNone();
             }
             // ROS_INFO("%s is chased", chased.c_str());
         }
 
-        private: void handlerDefault(){
-
-        }
-
-        private: void handlerNone(){
-
-        }
         // private: std::string whoHoldBall()
         // {
         //     std::string inputHolder = "None"; // REMOVE NONE LATER
@@ -201,11 +201,40 @@ namespace gazebo
             move.request.target_y_coordinate = this->specificLoc[1];
             this->rosMoveSrv.call(move);
 
-            if(this->ballHolder != None){
-                this->handlerDefault();
+        }
+
+        private: void handlerDefault(){
+            double current_distance = calculateDist(this->modelName, this->ballHolder);
+
+            if(current_distance < 0.5){
+                ssl_robocup_gazebo::Attach detach;
+                detach.request.model_name_1 = this->ballHolder;
+                detach.request.link_name_1 = "rack";
+                detach.request.model_name_2 = "ball";
+                detach.request.link_name_2 = "ball";
+                this->rosDettachSrv.call(detach);
+
+                usleep(3000000);
+
+                ssl_robocup_gazebo::Attach attach;
+                attach.request.model_name_1 = this->modelName;
+                attach.request.link_name_1 = "rack";
+                attach.request.model_name_2 = "ball";
+                attach.request.link_name_2 = "ball";
+                this->rosAttachSrv.call(attach);
             }
-            else{
-                this->handlerNone();
+        }
+
+        private: void handlerNone(){
+            double current_distance = calculateDist(this->modelName, "ball");
+
+            if(current_distance <= 0.25){
+                ssl_robocup_gazebo::Attach attach;
+                attach.request.model_name_1 = this->modelName;
+                attach.request.link_name_1 = "rack";
+                attach.request.model_name_2 = "ball";
+                attach.request.link_name_2 = "ball";
+                this->rosAttachSrv.call(attach);
             }
         }
 
@@ -270,6 +299,8 @@ namespace gazebo
             this->rosDistSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::FindDistance>("/kinetics/calculateDist");
             this->rosKickSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveBall>("/kinetics/move_ball");
             this->rosMoveSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveToCoord>("/kinetics/move_to_coord");
+            this->rosAttachSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::Attach>("/link_attacher_node/attach");
+            this->rosDettachSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::Attach>("/link_attacher_node/detach");
 
             ros::SubscribeOptions so =
                 ros::SubscribeOptions::create<ssl_robocup_gazebo::GameMessage>(
