@@ -46,7 +46,7 @@ namespace gazebo
         private: ros::Subscriber rosGamePluginSub;
         private: ros::CallbackQueue rosQueue;
         private: std::thread rosQueueThread;
-        // private: int specificLoc[2];
+        private: double specificLoc[2];
 
         private: void whichGoal(std::string modelName)
         {
@@ -54,19 +54,27 @@ namespace gazebo
             else { this->enemyGoal = "robocup_ssl_left_goal"; }
         }
 
-        // private: void setSpecLoc()
-        // {
-        //     if (modelName[0] == 'A') 
-        //     { 
-        //         this->specificLoc[0] = 0; 
-        //         this->specificLoc[1] = 0;
-        //     }
-        //     else
-        //     {
-        //         this->specificLoc[0] = 0; 
-        //         this->specificLoc[1] = 0;
-        //     }
-        // }
+        private: void setSpecLoc()
+        {
+            if (this->modelName[7] == '1') 
+            { 
+                this->specificLoc[0] = -3.5;
+                this->specificLoc[1] = 1;
+            }
+            else if (this->modelName[7] == '2')
+            {
+                this->specificLoc[0] = -3;
+                this->specificLoc[1] = 0;
+            }
+            else
+            {
+                this->specificLoc[0] = -3.5;
+                this->specificLoc[1] = -1;
+            }
+
+            if (this->modelName[0] == 'B') { this->specificLoc[0] = - this->specificLoc[0]; }
+            ROS_INFO("SPECIFIC LOCATION: %lf", this->specificLoc[0]);
+        }
 
         private: void chase(std::string chased)
         {
@@ -162,22 +170,19 @@ namespace gazebo
         private: void moveSpecLoc()
         {
             // Call service to move this robot to spesific location
-            // SPECIFIC LOCATION
-            // ADD LOGIC LATER TO DIFFERENTIATE TEAM A AND B
-            double xLoc = 3.0, yLoc = -3.0;
 
             ssl_robocup_gazebo::MoveToCoord move;
             move.request.origin_model_name = this->modelName;
             move.request.origin_link_name = "rack";
-            move.request.target_x_coordinate = xLoc;
-            move.request.target_y_coordinate = yLoc;
+            move.request.target_x_coordinate = this->specificLoc[0];
+            move.request.target_y_coordinate = this->specificLoc[1];
             this->rosMoveSrv.call(move);
         }
 
         public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
         {
             this->ballHolder = _msg->ball_holder; //whoHoldBall();
-            ROS_INFO("BALL HOLDER: %s", this->ballHolder.c_str());
+            //ROS_INFO("BALL HOLDER: %s", this->ballHolder.c_str());
             int switching = isMeAllyEnemy(this->ballHolder);
             switch (switching)
             {
@@ -248,7 +253,7 @@ namespace gazebo
 
             this->modelName = this->model->GetName().c_str();
             whichGoal(this->modelName);
-            // setSpecLoc();
+            setSpecLoc();
 
             // this->updateConnection = event::Events::ConnectWorldUpdateBegin(
             //     std::bind(&BehaviorTree::OnUpdate, this));
