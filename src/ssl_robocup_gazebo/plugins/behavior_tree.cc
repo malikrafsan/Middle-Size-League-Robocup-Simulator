@@ -189,6 +189,13 @@ namespace gazebo
             move.request.target_x_coordinate = this->specificLoc[0];
             move.request.target_y_coordinate = this->specificLoc[1];
             this->rosMoveSrv.call(move);
+
+            if(this->ballHolder != None){
+                this->handlerDefault();
+            }
+            else{
+                this->handlerNone();
+            }
         }
 
         public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
