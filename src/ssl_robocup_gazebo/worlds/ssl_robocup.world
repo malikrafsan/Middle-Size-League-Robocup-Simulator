@@ -44,6 +44,7 @@
       <uri>model://robocup_ssl_robot</uri>
       <!-- <uri>model://turtlebot</uri> -->
       <name>A_robot1</name>
+      <plugin name="behavior_tree" filename="libbehavior_tree.so"/>
     </include>
     <!-- A_robot2 -->
     <include>
