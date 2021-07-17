@@ -63,6 +63,7 @@ add_service_files(
   MoveBall.srv
   SetOrient.srv
   FindDistance.srv
+  MoveToCoord.srv
 )
 
 
@@ -256,3 +257,6 @@ target_link_libraries(game_plugin ${GAZEBO_LIBRARIES} )
 
 add_library(behavior_tree SHARED plugins/behavior_tree.cc)
 target_link_libraries(behavior_tree ${GAZEBO_LIBRARIES} )
+
+add_library(move_to_coord SHARED plugins/move_to_coord.cc)
+target_link_libraries(move_to_coord ${GAZEBO_LIBRARIES} )

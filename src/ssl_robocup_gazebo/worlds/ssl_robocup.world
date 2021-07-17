@@ -3,6 +3,7 @@
   <world name="default">
     <plugin name="ros_link_attacher_plugin" filename="libgazebo_ros_link_attacher.so"/>
     <plugin name="follow_object" filename="libfollow_object.so"/>
+    <plugin name="move_to_coord" filename="libmove_to_coord.so"/>
     <plugin name="goal_out_detection" filename="libgoal_out_detection.so"/>
     <plugin name="game_plugin" filename="libgame_plugin.so"/>
     <plugin name="find_distance" filename="libfind_distance.so"/>

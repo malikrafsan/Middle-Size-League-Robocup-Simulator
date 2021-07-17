@@ -21,6 +21,9 @@
 #include "ssl_robocup_gazebo/Attach.h"
 #include "ssl_robocup_gazebo/AttachRequest.h"
 #include "ssl_robocup_gazebo/AttachResponse.h"
+#include "ssl_robocup_gazebo/MoveToCoord.h"
+#include "ssl_robocup_gazebo/MoveToCoordRequest.h"
+#include "ssl_robocup_gazebo/MoveToCoordResponse.h"
 #include <string>
 
 namespace gazebo
@@ -31,6 +34,8 @@ namespace gazebo
         private: ros::ServiceClient rosChaserSrv;
         private: ros::ServiceClient rosDistSrv;
         private: ros::ServiceClient rosAttachSrv;
+        private: ros::ServiceClient rosKickSrv;
+        private: ros::ServiceClient rosMoveSrv;        
         private: physics::ModelPtr model;
         private: event::ConnectionPtr updateConnection;
         private: std::string modelName;
@@ -100,7 +105,15 @@ namespace gazebo
 
         private: void kickBall(std::string targetName)
         {
+            // Call service to detach the ball from this
+
             // Call service to kick the ball to target object
+            ssl_robocup_gazebo::MoveBall kicking;
+            kicking.request.origin_model_name = this->modelName;
+            kicking.request.target_model_name = targetName;
+            this->rosKickSrv.call(kicking);
+
+            ROS_INFO("ball is kicked to %s", targetName.c_str());
         }
 
         private: std::string whoCloseToGoal()
@@ -122,11 +135,7 @@ namespace gazebo
             double distGoalRobot[3];
             for (int i=0;i<3;i++)
             {
-                ssl_robocup_gazebo::FindDistance dist;
-                dist.request.origin_model_name = this->enemyGoal;
-                dist.request.target_model_name = arrRobotName[i];
-                this->rosDistSrv.call(dist);
-                distGoalRobot[i] = dist.response.distance;
+                distGoalRobot[i] = calculateDist(this->enemyGoal,arrRobotName[i]);
             }
             int minIndex = 2;
             for (int j=0;j<2;j++)
@@ -134,6 +143,30 @@ namespace gazebo
                 if (distGoalRobot[j] < distGoalRobot[minIndex]) { minIndex = j; }
             }
             return arrRobotName[minIndex];
+        }
+
+        private: double calculateDist(std::string origin, std::string target)
+        {
+            ssl_robocup_gazebo::FindDistance dist;
+            dist.request.origin_model_name = origin;
+            dist.request.target_model_name = target;
+            this->rosDistSrv.call(dist);
+            return dist.response.distance;
+        }
+
+        private: void moveSpecLoc()
+        {
+            // Call service to move this robot to spesific location
+            // SPECIFIC LOCATION
+            // ADD LOGIC LATER TO DIFFERENTIATE TEAM A AND B
+            double xLoc = 3.0, yLoc = -3.0;
+
+            ssl_robocup_gazebo::MoveToCoord move;
+            move.request.origin_model_name = this->modelName;
+            move.request.origin_link_name = "rack";
+            move.request.target_x_coordinate = xLoc;
+            move.request.target_y_coordinate = yLoc;
+            this->rosMoveSrv.call(move);
         }
 
         public: void OnUpdate()
@@ -163,9 +196,7 @@ namespace gazebo
 
                 // Ally of this robot hold the ball
                 case 2:
-                    chase(this->enemyGoal); 
-                    // TEMPORARY, TRY MOVING TO SPECIFIC LOCATION
-                    // BUT WE MUST CREATE NEW MECHANISM TO DO IT
+                    moveSpecLoc();
                     break;
 
                 // Enemy of this robot hold the ball
@@ -188,6 +219,8 @@ namespace gazebo
             this->rosNode.reset(new ros::NodeHandle("behavior_tree"));
             this->rosChaserSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::SetOrient>("/kinetics/set_orient_n_chase");
             this->rosDistSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::FindDistance>("/kinetics/calculateDist");
+            this->rosKickSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveBall>("/kinetics/move_ball");
+            this->rosMoveSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveToCoord>("/kinetics/move_to_coord");
 
             this->modelName = this->model->GetName().c_str();
             whichGoal(this->modelName);

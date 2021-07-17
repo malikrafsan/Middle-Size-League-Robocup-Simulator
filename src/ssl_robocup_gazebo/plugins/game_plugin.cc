@@ -60,16 +60,16 @@ class GamePlugin : public WorldPlugin
             ssl_robocup_gazebo::GameMessage game_message;
             this->rosQueue.callAvailable(ros::WallDuration(timeout));
             game_message.ball_holder= this->ball_holder.c_str();
-            game_message.model_at_goal_radius.A_robot1 = this->checkRadiusToGoal("turtlebot1");
-            game_message.model_at_goal_radius.A_robot2 = this->checkRadiusToGoal("turtlebot2");
-            game_message.model_at_goal_radius.A_robot3 = this->checkRadiusToGoal("turtlebot3");
+            game_message.model_at_goal_radius.A_robot1 = this->checkRadiusToGoal("A_robot1");
+            game_message.model_at_goal_radius.A_robot2 = this->checkRadiusToGoal("A_robot2");
+            game_message.model_at_goal_radius.A_robot3 = this->checkRadiusToGoal("A_robot3");
             this->rosPub.publish(game_message);
         }
     }
 
     private: bool checkRadiusToGoal(std::string model_name){
       ssl_robocup_gazebo::FindDistance distance_msg; 
-      distance_msg.request.target_model_name = "robocup_ssl_left_goal";
+      distance_msg.request.target_model_name = "robocup_ssl_right_goal";
       distance_msg.request.origin_model_name = model_name;
       double distanceToGoal = this->rosDistanceSrv.call(distance_msg);
       if(distance_msg.response.distance < 1.75){
