@@ -3,7 +3,9 @@
   <world name="default">
     <plugin name="ros_link_attacher_plugin" filename="libgazebo_ros_link_attacher.so"/>
     <plugin name="follow_object" filename="libfollow_object.so"/>
+    <plugin name="move_to_coord" filename="libmove_to_coord.so"/>
     <plugin name="goal_out_detection" filename="libgoal_out_detection.so"/>
+    <plugin name="game_plugin" filename="libgame_plugin.so"/>
     <plugin name="find_distance" filename="libfind_distance.so"/>
     <!-- A ground plane -->
     <include>
@@ -36,27 +38,52 @@
       <name>ball</name>
       <plugin name="ball_controller" filename="libball_controller.so"/>
     </include>
-    <!-- Turtlebot 1 -->
+    <!-- A_robot2 -->
     <include>
-      <pose>4 2 0.01 0 0 0</pose>
-      <uri>model://turtlebot</uri>
-      <name>turtlebot1</name>
-      <!-- <plugin name="model_push" filename="libmodel_push.so"/> -->
-      <plugin name="set_orient_and_chase" filename="libset_orient_and_chase.so"/>
+      <pose>-2 0 0 0 0 3.1416</pose>
+      <uri>model://robocup_ssl_robot</uri>
+      <!-- <uri>model://turtlebot</uri> -->
+      <name>A_robot1</name>
     </include>
-    <!-- Turtlebot 2 -->
+    <!-- A_robot2 -->
     <include>
-      <pose>0 1 0.01 0 0 0</pose>
-      <uri>model://turtlebot</uri>
-      <name>turtlebot2</name>
-      <plugin name="move_to_goal" filename="libmove_to_goal.so"/>
+      <pose>-1.5 1 0 0 0 3.1416</pose>
+      <uri>model://robocup_ssl_robot</uri>
+      <!-- <uri>model://turtlebot</uri> -->
+      <name>A_robot2</name>
+      <plugin name="behavior_tree" filename="libbehavior_tree.so"/>
     </include>
-    <!-- Turtlebot 3 -->
+    <!-- A_robot3 -->
     <include>
-      <pose>-3 -1 0.01 0 0 -1.52</pose>
-      <uri>model://turtlebot</uri>
-      <name>turtlebot3</name>
-      <plugin name="make_goal" filename="libmake_goal.so"/>
+      <pose>-1.5 -1 0 0 0 3.1416</pose>
+      <uri>model://robocup_ssl_robot</uri>
+      <!-- <uri>model://turtlebot</uri> -->
+      <name>A_robot3</name>
+      <plugin name="behavior_tree" filename="libbehavior_tree.so"/>
+    </include>
+    <!-- B_robot2 -->
+    <include>
+      <pose>-0.5 0 0 0 0 0</pose>
+      <uri>model://robocup_ssl_robot</uri>
+      <!-- <uri>model://turtlebot</uri> -->
+      <name>B_robot1</name>
+      <plugin name="behavior_tree" filename="libbehavior_tree.so"/>
+    </include>
+    <!-- B_robot2 -->
+    <include>
+      <pose>1.5 1 0 0 0 0</pose>
+      <uri>model://robocup_ssl_robot</uri>
+      <!-- <uri>model://turtlebot</uri> -->
+      <name>B_robot2</name>
+      <plugin name="behavior_tree" filename="libbehavior_tree.so"/>
+    </include>
+    <!-- B_robot3 -->
+    <include>
+      <pose>1.5 -1 0 0 0 0</pose>
+      <uri>model://robocup_ssl_robot</uri>
+      <!-- <uri>model://turtlebot</uri> -->
+      <name>B_robot3</name>
+      <plugin name="behavior_tree" filename="libbehavior_tree.so"/>
     </include>
   </world>
 </sdf>

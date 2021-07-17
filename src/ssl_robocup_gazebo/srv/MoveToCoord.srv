@@ -1,0 +1,7 @@
+string origin_model_name
+string origin_link_name
+float64 target_x_coordinate
+float64 target_y_coordinate
+---
+bool ok
+

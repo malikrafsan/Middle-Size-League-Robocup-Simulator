@@ -1,0 +1,2 @@
+string ball_holder 
+ModelAtGoalRadius model_at_goal_radius
