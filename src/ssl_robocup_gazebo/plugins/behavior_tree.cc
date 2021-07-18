@@ -140,6 +140,7 @@ namespace gazebo
                 attach.request.model_name_2 = "ball";
                 attach.request.link_name_2 = "ball";
                 this->rosAttachSrv.call(attach);
+                
                 ssl_robocup_gazebo::BallHolder ball_handler;
                 ball_handler.request.model_name = this->modelName;
                 this->rosBallHandlerSrv.call(ball_handler);
@@ -195,6 +196,10 @@ namespace gazebo
             detach.request.model_name_2 = "ball";
             detach.request.link_name_2 = "ball";
             this->rosDetachSrv.call(detach);
+
+            ssl_robocup_gazebo::BallHolder ball_handler;
+            ball_handler.request.model_name = "None";
+            this->rosBallHandlerSrv.call(ball_handler);
 
             // Call service to kick the ball to target object
             ssl_robocup_gazebo::MoveBall kicking;
