@@ -221,12 +221,6 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
-add_library(model_push SHARED plugins/model_push.cc)
-target_link_libraries(model_push ${GAZEBO_LIBRARIES})
-
-add_library(follow_ball SHARED plugins/follow_ball.cc)
-target_link_libraries(follow_ball ${GAZEBO_LIBRARIES})
-
 add_library(gazebo_ros_link_attacher SHARED plugins/gazebo_ros_link_attacher.cc)
 target_link_libraries(gazebo_ros_link_attacher ${GAZEBO_LIBRARIES})
 
@@ -236,17 +230,8 @@ target_link_libraries(goal_out_detection ${GAZEBO_LIBRARIES} )
 add_library(set_orient_and_chase SHARED plugins/set_orient_and_chase.cc)
 target_link_libraries(set_orient_and_chase ${GAZEBO_LIBRARIES} )
 
-add_library(pass_ball SHARED plugins/pass_ball.cc)
-target_link_libraries(pass_ball ${GAZEBO_LIBRARIES} )
-
 add_library(ball_controller SHARED plugins/ball_controller.cc)
 target_link_libraries(ball_controller ${GAZEBO_LIBRARIES} )
-
-add_library(move_to_goal SHARED plugins/move_to_goal.cc)
-target_link_libraries(move_to_goal ${GAZEBO_LIBRARIES} )
-
-add_library(make_goal SHARED plugins/make_goal.cc)
-target_link_libraries(make_goal ${GAZEBO_LIBRARIES} )
 
 add_library(follow_object SHARED plugins/follow_object.cc)
 target_link_libraries(follow_object ${GAZEBO_LIBRARIES} )
