@@ -276,7 +276,7 @@ namespace gazebo
         public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
         {
             this->freezeState = checkModelFreeze(_msg);
-            if(this->freezeState) {std::cout << this->modelName << std::endl;return;}
+            if(this->freezeState) {return;}
             this->ballHolder = _msg->ball_holder;
             int switching = isMeAllyEnemy(this->ballHolder);
             switch (switching)
