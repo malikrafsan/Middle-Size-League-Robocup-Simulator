@@ -81,7 +81,7 @@ namespace gazebo
                 this->specificLoc[1] = -1;
             }
 
-            if (this->modelName[0] == 'B') { this->specificLoc[0] = - this->specificLoc[0]; }
+            if (this->modelName[0] == 'A') { this->specificLoc[0] = - this->specificLoc[0]; }
             // ROS_INFO("SPECIFIC LOCATION: %lf", this->specificLoc[0]);
         }
 
@@ -276,7 +276,7 @@ namespace gazebo
         public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
         {
             this->freezeState = checkModelFreeze(_msg);
-            if(this->freezeState) {return;}
+            if(this->freezeState) { return; }
             this->ballHolder = _msg->ball_holder;
             int switching = isMeAllyEnemy(this->ballHolder);
             switch (switching)

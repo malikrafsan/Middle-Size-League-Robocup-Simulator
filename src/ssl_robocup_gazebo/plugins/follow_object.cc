@@ -85,9 +85,9 @@ class SetOrient : public WorldPlugin
       if (magnitudeDist <= magnitudeVel) {
           this->origin->SetLinearVel(ignition::math::Vector3d(x_difference, y_difference, 0));
       } else {
-          double forceStrength = 3.0;
+          double forceStrength = 200.0;
           double normalization = forceStrength / magnitudeDist;
-          this->origin->GetLink(req.origin_link_name)->SetForce(ignition::math::Vector3d(100*normalization*x_difference, 100*normalization*y_difference, 0));  
+          this->origin->GetLink(req.origin_link_name)->SetForce(ignition::math::Vector3d(normalization*x_difference, normalization*y_difference, 0));  
       }
       res.ok = true;
       return true;
