@@ -12,6 +12,7 @@ namespace gazebo
   GazeboRosLinkAttacher::GazeboRosLinkAttacher() :
     nh_("link_attacher_node")
   {
+    numberAttach = 0;
   }
 
 
@@ -42,6 +43,7 @@ namespace gazebo
   bool GazeboRosLinkAttacher::attach(std::string model1, std::string link1,
                                      std::string model2, std::string link2)
   {
+    if(numberAttach == 1) return true;
 
     // look for any previous instance of the joint first.
     // if we try to create a joint in between two links
@@ -138,6 +140,7 @@ namespace gazebo
     ROS_DEBUG_STREAM("Init");
     j.joint->Init();
     ROS_INFO_STREAM("Attach finished.");
+    numberAttach++;
 
     return true;
   }
@@ -145,6 +148,7 @@ namespace gazebo
   bool GazeboRosLinkAttacher::detach(std::string model1, std::string link1,
                                      std::string model2, std::string link2)
   {
+    if(numberAttach == 1) numberAttach--;
       // search for the instance of joint and do detach
       fixedJoint j;
       if(this->getJoint(model1, link1, model2, link2, j)){

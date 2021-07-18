@@ -17,6 +17,7 @@
 #include "nav_msgs/Odometry.h"
 #include <tf/tf.h>
 #include "ssl_robocup_gazebo/GameMessage.h"
+#include "ssl_robocup_gazebo/Freeze.h"
 #include "ssl_robocup_gazebo/FindDistance.h"
 #include "ssl_robocup_gazebo/FindDistanceRequest.h"
 #include "ssl_robocup_gazebo/FindDistanceResponse.h"
@@ -50,6 +51,14 @@ class GamePlugin : public WorldPlugin
     this->rosPub = this->nh.advertise<ssl_robocup_gazebo::GameMessage>("game_info",100);
     this->rosBallHolderSrvPublisher = this->nh.advertiseService("ball_holder", &GamePlugin::BallHolderCallback, this);
     this->rosDistanceSrvClient = this->nh.serviceClient<ssl_robocup_gazebo::FindDistance>("/kinetics/calculateDist");
+    ssl_robocup_gazebo::Freeze freeze;
+    freeze.A_robot1=false;
+    freeze.A_robot2=false;
+    freeze.A_robot3=false;
+    freeze.B_robot1=false;
+    freeze.B_robot2=false;
+    freeze.B_robot3=false;
+    this->freeze_state = freeze; 
 
     this->rosQueueThread =
     std::thread(std::bind(&GamePlugin::QueueThread, this));
@@ -70,6 +79,18 @@ class GamePlugin : public WorldPlugin
             game_message.model_at_goal_radius.B_robot1 = this->checkRadiusToGoal("B_robot1");
             game_message.model_at_goal_radius.B_robot2 = this->checkRadiusToGoal("B_robot2");
             game_message.model_at_goal_radius.B_robot3 = this->checkRadiusToGoal("B_robot3");
+            if ((world->RealTime() - this->time_checkpoint) > 2){
+              ssl_robocup_gazebo::Freeze freeze;
+              freeze.A_robot1=false;
+              freeze.A_robot2=false;
+              freeze.A_robot3=false;
+              freeze.B_robot1=false;
+              freeze.B_robot2=false;
+              freeze.B_robot3=false;
+              game_message.freeze = freeze; 
+            } else{
+              game_message.freeze = this->freeze_state;
+            }
             this->rosPub.publish(game_message);
         }
     }
@@ -91,7 +112,64 @@ class GamePlugin : public WorldPlugin
 
     private: bool BallHolderCallback(ssl_robocup_gazebo::BallHolder::Request &req,
                                     ssl_robocup_gazebo::BallHolder::Response &res){
+      this->time_checkpoint = world->RealTime();
+      std::string prev = this->ball_holder;
       this->ball_holder = req.model_name;
+      ssl_robocup_gazebo::Freeze freeze;
+      if(prev == "A_robot1"){
+        freeze.A_robot1=true;
+        freeze.A_robot2=false;
+        freeze.A_robot3=false;
+        freeze.B_robot1=false;
+        freeze.B_robot2=false;
+        freeze.B_robot3=false;
+        this->freeze_state = freeze; 
+      }
+      else if(prev == "A_robot2"){
+        freeze.A_robot1=false;
+        freeze.A_robot2=true;
+        freeze.A_robot3=false;
+        freeze.B_robot1=false;
+        freeze.B_robot2=false;
+        freeze.B_robot3=false;
+        this->freeze_state = freeze; 
+      }
+      else if(prev == "A_robot3"){
+        freeze.A_robot1=false;
+        freeze.A_robot2=false;
+        freeze.A_robot3=true;
+        freeze.B_robot1=false;
+        freeze.B_robot2=false;
+        freeze.B_robot3=false;
+        this->freeze_state = freeze; 
+      }
+      else if(prev == "B_robot1"){
+        freeze.A_robot1=false;
+        freeze.A_robot2=false;
+        freeze.A_robot3=false;
+        freeze.B_robot1=true;
+        freeze.B_robot2=false;
+        freeze.B_robot3=false;
+        this->freeze_state = freeze; 
+      }
+      else if(prev == "B_robot2"){
+        freeze.A_robot1=false;
+        freeze.A_robot2=false;
+        freeze.A_robot3=false;
+        freeze.B_robot1=false;
+        freeze.B_robot2=true;
+        freeze.B_robot3=false;
+        this->freeze_state = freeze; 
+      }
+      else if(prev == "B_robot3"){
+        freeze.A_robot1=false;
+        freeze.A_robot2=false;
+        freeze.A_robot3=false;
+        freeze.B_robot1=false;
+        freeze.B_robot2=false;
+        freeze.B_robot3=true;
+        this->freeze_state = freeze; 
+      }
       res.ok = true;
       return true;
     }
@@ -99,6 +177,9 @@ class GamePlugin : public WorldPlugin
 
   /// \brief A node use for ROS transport
   private: ros::NodeHandle nh; 
+  private: ssl_robocup_gazebo::Freeze freeze_state;
+
+  // private: ssl_robocup_gazebo::GameMessage::Freeze;
 
   private: ros::ServiceServer rosBallHolderSrvPublisher;
   private: ros::ServiceClient rosDistanceSrvClient;
@@ -125,9 +206,10 @@ class GamePlugin : public WorldPlugin
   private: std::string ball_holder;
 
   private: physics::ModelPtr ally;
+
+  private: common::Time time_checkpoint;
 };
 
 // Register this plugin with the simulator
 GZ_REGISTER_WORLD_PLUGIN(GamePlugin)
 }
-

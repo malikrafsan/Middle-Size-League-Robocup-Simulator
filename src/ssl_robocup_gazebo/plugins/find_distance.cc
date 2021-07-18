@@ -11,9 +11,9 @@
 #include <ignition/math/Vector3.hh>
 #include <math.h>
 #include <cmath>
-#include "../../../devel/include/ssl_robocup_gazebo/FindDistance.h"
-#include "../../../devel/include/ssl_robocup_gazebo/FindDistanceRequest.h"
-#include "../../../devel/include/ssl_robocup_gazebo/FindDistanceResponse.h"
+#include "ssl_robocup_gazebo/FindDistance.h"
+#include "ssl_robocup_gazebo/FindDistanceRequest.h"
+#include "ssl_robocup_gazebo/FindDistanceResponse.h"
 
 namespace gazebo
 {

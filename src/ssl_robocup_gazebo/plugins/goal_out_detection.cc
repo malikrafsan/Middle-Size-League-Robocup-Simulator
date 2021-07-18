@@ -13,6 +13,7 @@
 #include "gazebo/physics/physics.hh"
 #include <std_msgs/Float64.h>
 #include <std_srvs/Empty.h>
+#include <gazebo/common/common.hh>
 #include "ssl_robocup_gazebo/GameMessage.h"
 
 namespace gazebo
@@ -61,27 +62,47 @@ class ResetWorld : public WorldPlugin
       if (ball_position.response.pose.position.x > 4.5 || ball_position.response.pose.position.x < -4.5 || 
       ball_position.response.pose.position.y > 3 || ball_position.response.pose.position.y < -3)
       {
-          // gazebo_msgs::SetModelState new_ball_position;  
-          // new_ball_position.request.model_state.model_name = "ball";
-          // if(this->rosSetPositionSrv.call(new_ball_position)){
-          //   std::cout << "success" << std::endl;
-          // } else {
-          //   std::cout << "fail" << std::endl;
-          // }
+          this->previous_time = world->RealTime();
           std_srvs::Empty rosEmptySrv;
-          // ros::service::call("/gazebo/reset_world", rosEmptySrv);
+          ros::service::call("/gazebo/reset_world", rosEmptySrv);
           if(_msg->ball_holder.find("A") != std::string::npos){
-            ros::service::call("/gazebo/pause_physics", rosEmptySrv);
-            // gazebo_msgs::SetModelState new_position; 
-            // new_position.request.model_state.model_name = "A_robot1";
-            // new_position.request.model_state.pose.position.x = 2;
-            // new_position.request.model_state.pose.orientation.z = 3.14;
-            // this->rosSetPositionSrv.call(new_position);
-            // std::cout << new_position.response.success << std::endl;
-            // ros::service::call("/gazebo/unpause_physics", rosEmptySrv);
-          } else {
-
-          }
+            while(true){
+              if ((world->RealTime() - this->previous_time) > 0.1)
+              {
+                ros::service::call("/gazebo/pause_physics", rosEmptySrv);
+                gazebo_msgs::SetModelState new_position; 
+                new_position.request.model_state.model_name = "A_robot1";
+                new_position.request.model_state.pose.position.x = -2;
+                new_position.request.model_state.pose.orientation.z = 3.14;
+                this->rosSetPositionSrv.call(new_position);
+                new_position.request.model_state.model_name = "B_robot1";
+                new_position.request.model_state.pose.position.x = -0.5;
+                new_position.request.model_state.pose.orientation.z = 3.14;
+                this->rosSetPositionSrv.call(new_position);
+                std::cout << new_position.response.success << std::endl;
+                this->previous_time = world->RealTime();          
+                ros::service::call("/gazebo/unpause_physics", rosEmptySrv);
+              }
+            }
+           } else {
+              while(true){
+                if ((world->RealTime() - this->previous_time) > 0.1)
+                {
+                  ros::service::call("/gazebo/pause_physics", rosEmptySrv);
+                  gazebo_msgs::SetModelState new_position; 
+                  new_position.request.model_state.model_name = "B_robot1";
+                  new_position.request.model_state.pose.position.x = 2;
+                  this->rosSetPositionSrv.call(new_position);
+                  new_position.request.model_state.model_name = "A_robot1";
+                  new_position.request.model_state.pose.position.x = 0.5;
+                  this->rosSetPositionSrv.call(new_position);
+                  std::cout << new_position.response.success << std::endl;
+                  this->previous_time = world->RealTime();          
+                  ros::service::call("/gazebo/unpause_physics", rosEmptySrv);
+                  break;
+                }
+              }
+         }
       }
   
   }
@@ -104,6 +125,8 @@ class ResetWorld : public WorldPlugin
   private: ros::ServiceClient rosGetPositionSrv;
   private: ros::ServiceClient rosSetPositionSrv;
   private: ros::ServiceClient rosEmptySrv;
+  private: common::Time previous_time;
+
 
   private: ros::Subscriber rosGamePluginSub;
 

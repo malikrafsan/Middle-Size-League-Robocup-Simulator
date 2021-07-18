@@ -25,6 +25,9 @@
 #include "ssl_robocup_gazebo/MoveToCoordRequest.h"
 #include "ssl_robocup_gazebo/MoveToCoordResponse.h"
 #include "ssl_robocup_gazebo/GameMessage.h"
+#include "ssl_robocup_gazebo/BallHolder.h"
+#include "ssl_robocup_gazebo/BallHolderRequest.h"
+#include "ssl_robocup_gazebo/BallHolderResponse.h"
 #include "ros/subscribe_options.h"
 #include <string>
 #include <unistd.h>
@@ -38,9 +41,10 @@ namespace gazebo
         private: ros::ServiceClient rosChaserSrv;
         private: ros::ServiceClient rosDistSrv;
         private: ros::ServiceClient rosAttachSrv;
-        private: ros::ServiceClient rosDettachSrv;
+        private: ros::ServiceClient rosDetachSrv;
         private: ros::ServiceClient rosKickSrv;
         private: ros::ServiceClient rosMoveSrv;        
+        private: ros::ServiceClient rosBallHandlerSrv;        
         private: physics::ModelPtr model;
         private: event::ConnectionPtr updateConnection;
         private: std::string modelName;
@@ -49,6 +53,7 @@ namespace gazebo
         private: ros::Subscriber rosGamePluginSub;
         private: ros::CallbackQueue rosQueue;
         private: std::thread rosQueueThread;
+        private: bool freezeState;
   
         private: double specificLoc[2];
 
@@ -88,15 +93,57 @@ namespace gazebo
             chasing.request.origin_link_name = "rack";
             chasing.request.target_model_name = chased;
             this->rosChaserSrv.call(chasing);
-            
-            if(this->ballHolder != "None"){
+            if(this->ballHolder == this->modelName) return;
+            else if(this->ballHolder != "None"){
                 //Case Bola dah dipegang sama musuh -> Rebut 
                 this->handlerDefault();
             }
-            else{
+            else if(this->ballHolder == "None"){
                 this->handlerNone();
             }
             // ROS_INFO("%s is chased", chased.c_str());
+        }
+
+        private: void handlerDefault(){
+            double current_distance = calculateDist(this->modelName, this->ballHolder);
+
+            if(current_distance < 0.25){
+                ssl_robocup_gazebo::Attach detach;
+                detach.request.model_name_1 = this->ballHolder;
+                detach.request.link_name_1 = "rack";
+                detach.request.model_name_2 = "ball";
+                detach.request.link_name_2 = "ball";
+                this->rosDetachSrv.call(detach);
+
+                usleep(3000000);
+
+                ssl_robocup_gazebo::Attach attach;
+                attach.request.model_name_1 = this->modelName;
+                attach.request.link_name_1 = "rack";
+                attach.request.model_name_2 = "ball";
+                attach.request.link_name_2 = "ball";
+                this->rosAttachSrv.call(attach);
+
+                ssl_robocup_gazebo::BallHolder ball_handler;
+                ball_handler.request.model_name = this->modelName;
+                this->rosBallHandlerSrv.call(ball_handler);
+            }
+        }
+
+        private: void handlerNone(){
+            double current_distance = calculateDist(this->modelName, "ball");
+
+            if(current_distance <= 0.2){
+                ssl_robocup_gazebo::Attach attach;
+                attach.request.model_name_1 = this->modelName;
+                attach.request.link_name_1 = "rack";
+                attach.request.model_name_2 = "ball";
+                attach.request.link_name_2 = "ball";
+                this->rosAttachSrv.call(attach);
+                ssl_robocup_gazebo::BallHolder ball_handler;
+                ball_handler.request.model_name = this->modelName;
+                this->rosBallHandlerSrv.call(ball_handler);
+            }
         }
 
         // private: std::string whoHoldBall()
@@ -111,12 +158,12 @@ namespace gazebo
             std::string modelName = this->model->GetName().c_str();
             if (modelName[0] == inputHolder[0])
             {
-                if (modelName == inputHolder) { return 1; }
-                else { return 2; }
+                if (modelName == inputHolder) { return 1; } //self
+                else { return 2; } // team
             }
             else
             {
-                if (inputHolder == "None") { return 0; } 
+                if (inputHolder == "None") { return 0; } // none
                 else { return 3; }
             }
         }
@@ -143,11 +190,11 @@ namespace gazebo
         {
             // Call service to detach the ball from this
             ssl_robocup_gazebo::Attach detach;
-            detach.request.model_name_1 = this->modelName;
+            detach.request.model_name_1 = this->ballHolder;
             detach.request.link_name_1 = "rack";
             detach.request.model_name_2 = "ball";
             detach.request.link_name_2 = "ball";
-            this->rosDettachSrv.call(detach);
+            this->rosDetachSrv.call(detach);
 
             // Call service to kick the ball to target object
             ssl_robocup_gazebo::MoveBall kicking;
@@ -209,44 +256,20 @@ namespace gazebo
 
         }
 
-        private: void handlerDefault(){
-            double current_distance = calculateDist(this->modelName, this->ballHolder);
-
-            if(current_distance < 0.5){
-                ssl_robocup_gazebo::Attach detach;
-                detach.request.model_name_1 = this->ballHolder;
-                detach.request.link_name_1 = "rack";
-                detach.request.model_name_2 = "ball";
-                detach.request.link_name_2 = "ball";
-                this->rosDettachSrv.call(detach);
-
-                usleep(3000000);
-
-                ssl_robocup_gazebo::Attach attach;
-                attach.request.model_name_1 = this->modelName;
-                attach.request.link_name_1 = "rack";
-                attach.request.model_name_2 = "ball";
-                attach.request.link_name_2 = "ball";
-                this->rosAttachSrv.call(attach);
-            }
+        private: bool checkModelFreeze(const ssl_robocup_gazebo::GameMessageConstPtr &_msg){
+            if(this->modelName == "A_robot1") return (bool)_msg->freeze.A_robot1;
+            if(this->modelName == "A_robot2") return (bool)_msg->freeze.A_robot2;
+            if(this->modelName == "A_robot3") return (bool)_msg->freeze.A_robot3;
+            if(this->modelName == "B_robot1") return (bool)_msg->freeze.B_robot1;
+            if(this->modelName == "B_robot2") return (bool)_msg->freeze.B_robot2;
+            if(this->modelName == "B_robot3") return (bool)_msg->freeze.B_robot3;
         }
-
-        private: void handlerNone(){
-            double current_distance = calculateDist(this->modelName, "ball");
-
-            if(current_distance <= 0.25){
-                ssl_robocup_gazebo::Attach attach;
-                attach.request.model_name_1 = this->modelName;
-                attach.request.link_name_1 = "rack";
-                attach.request.model_name_2 = "ball";
-                attach.request.link_name_2 = "ball";
-                this->rosAttachSrv.call(attach);
-
-            }
-        }
+        
 
         public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
         {
+            this->freezeState = checkModelFreeze(_msg);
+            if(this->freezeState) return;
             this->ballHolder = _msg->ball_holder;
             int switching = isMeAllyEnemy(this->ballHolder);
             switch (switching)
@@ -307,7 +330,8 @@ namespace gazebo
             this->rosKickSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveBall>("/kinetics/move_ball");
             this->rosMoveSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::MoveToCoord>("/kinetics/move_to_coord");
             this->rosAttachSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::Attach>("/link_attacher_node/attach");
-            this->rosDettachSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::Attach>("/link_attacher_node/detach");
+            this->rosDetachSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::Attach>("/link_attacher_node/detach");
+            this->rosBallHandlerSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::BallHolder>("/game_plugin/ball_holder");
 
             ros::SubscribeOptions so =
                 ros::SubscribeOptions::create<ssl_robocup_gazebo::GameMessage>(
@@ -322,8 +346,8 @@ namespace gazebo
             whichGoal(this->modelName);
             setSpecLoc();
 
-            //this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-            //    std::bind(&BehaviorTree::OnUpdate, this));
+            // this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+            //     std::bind(&BehaviorTree::OnUpdate, this));
         }
     };
     GZ_REGISTER_MODEL_PLUGIN(BehaviorTree)
