@@ -209,7 +209,7 @@ namespace gazebo
             kicking.request.target_model_name = targetName;
             this->rosKickSrv.call(kicking);
 
-            // ROS_INFO("ball is kicked to %s", targetName.c_str());
+            ROS_INFO("ball is kicked to %s from %s", targetName.c_str(), this->modelName.c_str());
         }
 
         private: std::string whoCloseToGoal()

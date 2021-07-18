@@ -150,7 +150,7 @@ namespace gazebo
   {
     if(numberAttach == 1) numberAttach--;
       // search for the instance of joint and do detach
-      ROS_INFO("Detach called from model %s with link %s and model %s with link %s", model1, link1, model2, link2);
+      ROS_INFO("Detach called from model %s with link %s and model %s with link %s", model1.c_str(), link1.c_str(), model2.c_str(), link2.c_str());
       fixedJoint j;
       if(this->getJoint(model1, link1, model2, link2, j)){
           j.joint->Detach();

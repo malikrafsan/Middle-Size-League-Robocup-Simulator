@@ -27,7 +27,7 @@
     </include>
     <!-- RoboCup SPL 2014 right goal -->
     <include>
-      <pose>4.5 0.5 0 0 0 0</pose>
+      <pose>4.5 0 0 0 0 0</pose>
       <uri>model://robocup_ssl_goal</uri>
       <name>robocup_ssl_right_goal</name>
     </include>
