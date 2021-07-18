@@ -53,6 +53,7 @@ find_package(catkin REQUIRED
 add_message_files(
   FILES
   GameMessage.msg
+  Freeze.msg
   ModelAtGoalRadius.msg
 )
 

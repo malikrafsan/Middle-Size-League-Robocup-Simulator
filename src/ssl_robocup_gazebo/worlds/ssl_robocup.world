@@ -27,13 +27,13 @@
     </include>
     <!-- RoboCup SPL 2014 right goal -->
     <include>
-      <pose>4.5 0 0 0 0 0</pose>
+      <pose>4.5 0.5 0 0 0 0</pose>
       <uri>model://robocup_ssl_goal</uri>
       <name>robocup_ssl_right_goal</name>
     </include>
     <!-- RoboCup SPL ball -->
     <include>
-      <pose>0 0 0.0315 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
       <uri>model://robocup_ssl_ball</uri>
       <name>ball</name>
       <plugin name="ball_controller" filename="libball_controller.so"/>
@@ -64,7 +64,7 @@
     </include>
     <!-- B_robot2 -->
     <include>
-      <pose>-0.5 0 0 0 0 0</pose>
+      <pose>-0.5 0 0 0 0 3.14</pose>
       <uri>model://robocup_ssl_robot</uri>
       <!-- <uri>model://turtlebot</uri> -->
       <name>B_robot1</name>
