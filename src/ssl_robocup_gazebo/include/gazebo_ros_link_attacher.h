@@ -19,9 +19,9 @@
 #include <gazebo/common/Events.hh>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
-#include "ssl_robocup_gazebo/Attach.h"
-#include "ssl_robocup_gazebo/AttachRequest.h"
-#include "ssl_robocup_gazebo/AttachResponse.h"
+#include "../../../devel/include/ssl_robocup_gazebo/Attach.h"
+#include "../../../devel/include/ssl_robocup_gazebo/AttachRequest.h"
+#include "../../../devel/include/ssl_robocup_gazebo/AttachResponse.h"
 
 namespace gazebo
 {
