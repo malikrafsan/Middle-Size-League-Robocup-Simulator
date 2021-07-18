@@ -29,6 +29,7 @@ class SetOrient : public WorldPlugin
     // Store the pointer to the model
     this->world = _parent;
 
+    // Initialize ROS node
     if (!ros::isInitialized())
     {
         int argc = 0;
@@ -36,33 +37,41 @@ class SetOrient : public WorldPlugin
         ros::init(argc, argv, "kinetics",
         ros::init_options::NoSigintHandler);
     }
-
     this->rosNode.reset(new ros::NodeHandle("kinetics"));
 
+    // Client to get model state service
     this->rosPositionSrv = this->rosNode->serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+    
+    // Advertise set orient and chase service
     this->setOrientPublisher = this->rosNode->advertiseService("set_orient_n_chase", &SetOrient::set_orient_callback, this);
   }
 
     public: bool set_orient_callback(ssl_robocup_gazebo::SetOrient::Request &req, ssl_robocup_gazebo::SetOrient::Response &res){
+      // Get position state of the target
       gazebo_msgs::GetModelState target_state;  
       target_state.request.model_name = req.target_model_name;
       this->rosPositionSrv.call(target_state);
 
+      // Get position state of the origin
       gazebo_msgs::GetModelState self_state;  
       self_state.request.model_name = req.origin_model_name;
       this->rosPositionSrv.call(self_state);
       this->origin = world->ModelByName(req.origin_model_name);
 
+      // Calculate magnitude distance
       double x_difference = target_state.response.pose.position.x-self_state.response.pose.position.x; 
       double y_difference = target_state.response.pose.position.y-self_state.response.pose.position.y;
       double magnitudeDist = std::sqrt(std::pow(x_difference,2) + std::pow(y_difference,2));
 
+      // Calculate magnitude velocity 
       double velBotX = self_state.response.twist.linear.x;
       double velBotY = self_state.response.twist.linear.y;
       double magnitudeVel = std::sqrt(std::pow(velBotX,2) + std::pow(velBotY,2));
 
+      // Calculate angle between the robot and the target
       double angle = std::atan2(-y_difference, -x_difference);
 
+      // Change quaternion value to roll pitch yaw
       tf::Quaternion q(
           self_state.response.pose.orientation.x,
           self_state.response.pose.orientation.y,
@@ -72,8 +81,10 @@ class SetOrient : public WorldPlugin
       double roll, pitch, yaw;
       m.getRPY(roll, pitch, yaw);
   
+      // Calculate different orientation needed to be alligned
       double difOrient = angle - yaw;
 
+      // Rotate the robot according to different orientation
       if (difOrient > 0.03) {
           this->origin->SetAngularVel(ignition::math::Vector3d(0, 0, 1));
       }
@@ -82,9 +93,13 @@ class SetOrient : public WorldPlugin
       } else {
           this->origin->SetAngularVel(ignition::math::Vector3d(0, 0, 0));
       }
+
+      // Chase the object
       if (magnitudeDist <= magnitudeVel) {
+          // Deceleration
           this->origin->SetLinearVel(ignition::math::Vector3d(x_difference, y_difference, 0));
       } else {
+          // Acceleration
           double forceStrength = 300.0;
           double normalization = forceStrength / magnitudeDist;
           this->origin->GetLink(req.origin_link_name)->SetForce(ignition::math::Vector3d(normalization*x_difference, normalization*y_difference, 0));  
@@ -93,24 +108,14 @@ class SetOrient : public WorldPlugin
       return true;
     }
 
-  /// \brief A node use for ROS transport
+  // ATTRIBUTES
   private: std::unique_ptr<ros::NodeHandle> rosNode;
-
-  /// \brief A ROS service client
   private: ros::ServiceClient rosPositionSrv;
-
-  /// \brief A ROS service publisher 
   private: ros::ServiceServer setOrientPublisher;
-
-  // Pointer to the update event connection
   private: event::ConnectionPtr updateConnection;
-
   private: physics::ModelPtr origin;
-
   private: physics::WorldPtr world;
-  
   private: physics::ModelPtr ball;
-
   private: physics::ModelPtr ally;
 };
 

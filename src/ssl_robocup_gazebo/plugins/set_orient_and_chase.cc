@@ -24,9 +24,9 @@ namespace gazebo
 {
 class Chase : public ModelPlugin
 {
-  // Called by the world update start event
   public: void OnUpdate()
   {
+      // Call service to chase the ball
       ssl_robocup_gazebo::SetOrient body;
       body.request.origin_model_name = this->model->GetName().c_str();
       body.request.origin_link_name = "rack";
@@ -36,10 +36,11 @@ class Chase : public ModelPlugin
 
   public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
   {
-    // Store the pointer to the model
+    // Store model pointer and world pointer
     this->model = _parent;
     this->world = _parent->GetWorld();
 
+    // Initialize ROS node
     if (!ros::isInitialized())
     {
         int argc = 0;
@@ -47,33 +48,24 @@ class Chase : public ModelPlugin
         ros::init(argc, argv, "pass_ball",
         ros::init_options::NoSigintHandler);
     }
-
     this->rosNode.reset(new ros::NodeHandle("pass_ball"));
 
+    // Client to services needed of this plugin
     this->rosPositionSrv = this->rosNode->serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
     this->rosChaserSrv = this->rosNode->serviceClient<ssl_robocup_gazebo::SetOrient>("/kinetics/set_orient_n_chase");
 
-    // Listen to the update event. This event is broadcast every
-    // simulation iteration.
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
         std::bind(&Chase::OnUpdate, this));
   }
-  /// \brief A node use for ROS transport
-  private: std::unique_ptr<ros::NodeHandle> rosNode;
 
-  /// \brief A ROS service client
+  // ATTRIBUTES
+  private: std::unique_ptr<ros::NodeHandle> rosNode;
   private: ros::ServiceClient rosPositionSrv;
   private: ros::ServiceClient rosChaserSrv;
-
-  // Pointer to the update event connection
   private: event::ConnectionPtr updateConnection;
-
   private: physics::ModelPtr model;
-
   private: physics::WorldPtr world;
-  
   private: physics::ModelPtr ball;
-
   private: physics::ModelPtr ally;
 };
 

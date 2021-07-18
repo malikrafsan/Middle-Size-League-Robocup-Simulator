@@ -79,7 +79,7 @@ class GamePlugin : public WorldPlugin
             game_message.model_at_goal_radius.B_robot1 = this->checkRadiusToGoal("B_robot1");
             game_message.model_at_goal_radius.B_robot2 = this->checkRadiusToGoal("B_robot2");
             game_message.model_at_goal_radius.B_robot3 = this->checkRadiusToGoal("B_robot3");
-            if ((world->RealTime() - this->time_checkpoint) > 2){
+            if ((world->RealTime() - this->time_checkpoint) > 3){
               ssl_robocup_gazebo::Freeze freeze;
               freeze.A_robot1=false;
               freeze.A_robot2=false;

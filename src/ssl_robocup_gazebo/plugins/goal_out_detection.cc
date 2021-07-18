@@ -20,14 +20,12 @@ namespace gazebo
 {
 class ResetWorld : public WorldPlugin
 {
-
-  
-
   public: void Load(physics::WorldPtr _parent, sdf::ElementPtr /*_sdf*/)
   {
     // Store the pointer to the model
     this->world = _parent;
 
+    // Initialize ROS node
     if (!ros::isInitialized())
     {
         int argc = 0;
@@ -35,13 +33,13 @@ class ResetWorld : public WorldPlugin
         ros::init(argc, argv, "reset_world",
         ros::init_options::NoSigintHandler);
     }
-
-    // Create our ROS node. This acts in a similar manner to
-    // the Gazebo node
     this->rosNode.reset(new ros::NodeHandle("reset_world"));
 
+    // Client to the services needed
     this->rosGetPositionSrv = this->rosNode->serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
     this->rosSetPositionSrv = this->rosNode->serviceClient<gazebo_msgs::SetModelState>("/gazebo/set_model_state");
+    
+    // Subcribe to messages from game plugin
     ros::SubscribeOptions so =
     ros::SubscribeOptions::create<ssl_robocup_gazebo::GameMessage>(
         "/game_plugin/game_info",
@@ -49,22 +47,26 @@ class ResetWorld : public WorldPlugin
         boost::bind(&ResetWorld::OnRosMsg, this, _1),
         ros::VoidPtr(), &this->rosQueue);
     this->rosGamePluginSub = this->rosNode->subscribe(so);
-
     this->rosQueueThread =
     std::thread(std::bind(&ResetWorld::QueueThread, this));
   }
 
-  public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg){
+  public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
+  {
+      // Get position state of the ball
       gazebo_msgs::GetModelState ball_position ;  
       ball_position.request.model_name = "ball";
       this->rosGetPositionSrv.call(ball_position);
 
+      // Check whether the ball is out from the field
       if (ball_position.response.pose.position.x > 4.5 || ball_position.response.pose.position.x < -4.5 || 
       ball_position.response.pose.position.y > 3 || ball_position.response.pose.position.y < -3)
       {
+          // Reset the world based on which robot hold the ball in the last
           this->previous_time = world->RealTime();
           std_srvs::Empty rosEmptySrv;
           ros::service::call("/gazebo/reset_world", rosEmptySrv);
+
           if(_msg->ball_holder.find("A") != std::string::npos){
             while(true){
               if ((world->RealTime() - this->previous_time) > 0.1)
@@ -116,29 +118,17 @@ class ResetWorld : public WorldPlugin
     }
   }
 
+  // ATTRIBUTES
   private: std::string ballHolder;
-
-  /// \brief A node use for ROS transport
   private: std::unique_ptr<ros::NodeHandle> rosNode;
-
-  /// \brief A ROS service client
   private: ros::ServiceClient rosGetPositionSrv;
   private: ros::ServiceClient rosSetPositionSrv;
   private: ros::ServiceClient rosEmptySrv;
   private: common::Time previous_time;
-
-
   private: ros::Subscriber rosGamePluginSub;
-
-  /// \brief A ROS callbackqueue that helps process messages
   private: ros::CallbackQueue rosQueue;
-
-  /// \brief A thread the keeps running the rosQueue
   private: std::thread rosQueueThread;
-
-  // Pointer to the update event connection
   private: event::ConnectionPtr updateConnection;
-
   private: physics::WorldPtr world;
 };
 
