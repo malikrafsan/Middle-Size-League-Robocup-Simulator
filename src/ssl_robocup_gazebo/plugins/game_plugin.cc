@@ -213,4 +213,3 @@ class GamePlugin : public WorldPlugin
 // Register this plugin with the simulator
 GZ_REGISTER_WORLD_PLUGIN(GamePlugin)
 }
-
