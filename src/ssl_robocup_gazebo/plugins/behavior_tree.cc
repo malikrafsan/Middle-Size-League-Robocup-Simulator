@@ -94,20 +94,22 @@ namespace gazebo
             chasing.request.target_model_name = chased;
             this->rosChaserSrv.call(chasing);
             if(this->ballHolder == this->modelName) return;
-            else if(this->ballHolder != "None"){
-                //Case Bola dah dipegang sama musuh -> Rebut 
-                this->handlerDefault();
-            }
             else if(this->ballHolder == "None"){
                 this->handlerNone();
+            }
+            else{
+                this->handlerDefault();
             }
             // ROS_INFO("%s is chased", chased.c_str());
         }
 
         private: void handlerDefault(){
-            double current_distance = calculateDist(this->modelName, this->ballHolder);
+            double current_distance = calculateDist(this->modelName, "ball");
 
-            if(current_distance < 0.25){
+            if(current_distance < 0.2){
+                common::Time time_checkpoint;
+
+                time_checkpoint = model->GetWorld()->RealTime();
                 ssl_robocup_gazebo::Attach detach;
                 detach.request.model_name_1 = this->ballHolder;
                 detach.request.link_name_1 = "rack";
@@ -115,18 +117,18 @@ namespace gazebo
                 detach.request.link_name_2 = "ball";
                 this->rosDetachSrv.call(detach);
 
-                usleep(3000000);
+                if ((model->GetWorld()->RealTime() - time_checkpoint) > 0.3){
+                    ssl_robocup_gazebo::Attach attach;
+                    attach.request.model_name_1 = this->modelName;
+                    attach.request.link_name_1 = "rack";
+                    attach.request.model_name_2 = "ball";
+                    attach.request.link_name_2 = "ball";
+                    this->rosAttachSrv.call(attach);
 
-                ssl_robocup_gazebo::Attach attach;
-                attach.request.model_name_1 = this->modelName;
-                attach.request.link_name_1 = "rack";
-                attach.request.model_name_2 = "ball";
-                attach.request.link_name_2 = "ball";
-                this->rosAttachSrv.call(attach);
-
-                ssl_robocup_gazebo::BallHolder ball_handler;
-                ball_handler.request.model_name = this->modelName;
-                this->rosBallHandlerSrv.call(ball_handler);
+                    ssl_robocup_gazebo::BallHolder ball_handler;
+                    ball_handler.request.model_name = this->modelName;
+                    this->rosBallHandlerSrv.call(ball_handler);
+                }
             }
         }
 
@@ -263,7 +265,7 @@ namespace gazebo
         public: void OnRosMsg(const ssl_robocup_gazebo::GameMessageConstPtr &_msg)
         {
             this->freezeState = checkModelFreeze(_msg);
-            if(this->freezeState) return;
+            if(this->freezeState) {std::cout << this->modelName << std::endl;return;}
             this->ballHolder = _msg->ball_holder;
             int switching = isMeAllyEnemy(this->ballHolder);
             switch (switching)
@@ -281,7 +283,7 @@ namespace gazebo
                     else 
                     {
                         std::string modelCloserToGoal = whoCloseToGoal();
-                        if (modelCloserToGoal == this->modelName) { chase(this->enemyGoal); }
+                        if (modelCloserToGoal == this->modelName.c_str()) { chase(this->enemyGoal); }
                         else { kickBall(modelCloserToGoal); }
                     }
                     break;

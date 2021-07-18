@@ -45,7 +45,6 @@ class MoveToCoord : public WorldPlugin
   }
 
   public: bool move_to_coord_callback(ssl_robocup_gazebo::MoveToCoord::Request &req, ssl_robocup_gazebo::MoveToCoord::Response &res){
-    ROS_INFO_STREAM("Received request to move model: '" << req.origin_model_name << "' to coordinate (x, y): (" <<  req.target_x_coordinate << ", " << req.target_y_coordinate << ")");
     gazebo_msgs::GetModelState self_state;  
     self_state.request.model_name = req.origin_model_name;
     this->rosPositionSrv.call(self_state);
