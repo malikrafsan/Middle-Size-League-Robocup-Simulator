@@ -142,6 +142,12 @@ namespace gazebo
         private: void kickBall(std::string targetName)
         {
             // Call service to detach the ball from this
+            ssl_robocup_gazebo::Attach detach;
+            detach.request.model_name_1 = this->modelName;
+            detach.request.link_name_1 = "rack";
+            detach.request.model_name_2 = "ball";
+            detach.request.link_name_2 = "ball";
+            this->rosDettachSrv.call(detach);
 
             // Call service to kick the ball to target object
             ssl_robocup_gazebo::MoveBall kicking;
@@ -235,6 +241,7 @@ namespace gazebo
                 attach.request.model_name_2 = "ball";
                 attach.request.link_name_2 = "ball";
                 this->rosAttachSrv.call(attach);
+
             }
         }
 
@@ -315,8 +322,8 @@ namespace gazebo
             whichGoal(this->modelName);
             setSpecLoc();
 
-            // this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-            //     std::bind(&BehaviorTree::OnUpdate, this));
+            //this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+            //    std::bind(&BehaviorTree::OnUpdate, this));
         }
     };
     GZ_REGISTER_MODEL_PLUGIN(BehaviorTree)
